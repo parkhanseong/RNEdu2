@@ -7,9 +7,10 @@ class TextScreen extends React.Component {
     const lastText = "Last Text";
     return (
       <View style={styles.container}>
-        <Text>Hello, World!</Text>
+        <Text>알파카파카</Text>
         <Text style={styles.text}>
-          <Text style={{ color: colors.text }}>Middle Text</Text>
+          가나다라마
+          <Text style={{ color: colors.main }}>바사아자차카</Text>
         </Text>
         <Text>This is {lastText}</Text>
       </View>
@@ -23,8 +24,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background
   },
   text: {
-    color: colors.main,
-    fontSize: 20
+    fontSize: 20,
+    color: colors.text
   }
 });
 

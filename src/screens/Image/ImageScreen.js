@@ -1,16 +1,19 @@
 import React from "react";
 import { StyleSheet, View, Image } from "react-native";
-import { colors, customStyle } from "../../lib/styleUtils";
-
-const urlString =
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEXzULFeLZZPHLSx3KfRl7Us4DjguSbY10aATlIjcoTx2vngY3hw";
+import { colors } from "../../lib/styleUtils";
 
 class ImageScreen extends React.Component {
   render() {
+    const urlString =
+      "https://cdn-images-1.medium.com/max/1200/1*KANHihva9OdXx2-V5EDn3g.png";
     return (
       <View style={styles.container}>
-        <Image style={styles.image} source={{ uri: urlString }} />
         <Image source={require("../../images/iconCreditCard.png")} />
+        <Image
+          style={styles.image}
+          source={{ uri: urlString }}
+          resizeMode="cover"
+        />
       </View>
     );
   }
@@ -19,12 +22,11 @@ class ImageScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    ...customStyle.center
+    backgroundColor: colors.background
   },
   image: {
-    width: 200,
-    height: 90
+    width: 300,
+    height: 300
   }
 });
 
