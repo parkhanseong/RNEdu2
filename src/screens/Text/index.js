@@ -1,2 +1,2 @@
 export { default as TextScreen } from "./TextScreen";
-// alpaca add test
+// 한글로 변경
