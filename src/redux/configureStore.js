@@ -6,4 +6,5 @@ const configureStore = initialState => {
   return store;
 };
 
+// git test
 export default configureStore;
