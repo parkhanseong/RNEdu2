@@ -6,9 +6,6 @@ import { colors } from '../../lib/styleUtils'
 class NetworkDetailScreen extends React.Component {
   render () {
     const { gender, name, team } = this.props.navigation.getParam('item')
-    // console.log(this.props.navigation.getParam("item"));
-    // console.log(gender)
-
     return (
       <View style={styles.container}>
         <View>

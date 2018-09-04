@@ -5,13 +5,10 @@ import {
   View,
   TouchableOpacity,
   Text,
-  // SwitchButton,
   ScrollView,
   FlatList,
-  // Switch,
-  // Alert,
+  Alert,
   TextInput
-  // Picker
 } from "react-native";
 import SwitchSelector from "react-native-switch-selector";
 import axios from "axios";
@@ -88,22 +85,27 @@ class NetworkScreen extends React.Component {
     });
   };
 
-  onPressSetProfile = () => {
+  _onPressSetProfile = () => {
     const data = this.state.setMembers;
     const url = "http://noldam.co.kr:4004/api/auth/test";
 
     return axios.post(url, data);
   };
 
+  _onPressDelete = () => {
+    Alert.alert("삭제 준비 중");
+  };
+
   render() {
     const {
       onPressBtnObject,
       onPressBtnList,
-      onPressSetProfile,
+      _onPressSetProfile,
       _onPressItemDetail,
       _onPress,
       _onPressSwitch,
-      onChangeText
+      onChangeText,
+      _onPressDelete
     } = this;
     const {
       singleMember: { gender, name, team },
@@ -134,7 +136,6 @@ class NetworkScreen extends React.Component {
             <TextInput
               style={styles.textInput}
               placeholder="이름을 입력해주세요"
-              /* value={}  */
               onChangeText={onChangeText("name")}
               autoCapitalize="none"
               autoCorrect={false}
@@ -160,7 +161,6 @@ class NetworkScreen extends React.Component {
             <TextInput
               style={styles.textInput}
               placeholder="소속을 입력해주세요"
-              /* value={} */
               onChangeText={onChangeText("team")}
               autoCapitalize="none"
               autoCorrect={false}
@@ -170,9 +170,9 @@ class NetworkScreen extends React.Component {
           </View>
           <View style={{ alignItems: "center" }}>
             <TouchableOpacity
-              style={styles.submitButton}
+              style={styles.btnAdd}
               activeOpacity={0.8}
-              onPress={() => onPressSetProfile()}
+              _onPress={() => _onPressSetProfile()}
             >
               <Text>추가</Text>
             </TouchableOpacity>
@@ -188,7 +188,17 @@ class NetworkScreen extends React.Component {
                     <View style={styles.itemView}>
                       <Text> 이름 : {item.name} </Text>
                       <Text> 성별 : {item.gender === 0 ? "남자" : "여자"}</Text>
-                      <Text> 소속 : {item.team}</Text>
+                      <View style={styles.parentTeamContainer}>
+                        <Text style={{ flex: 1 }}> 소속 : {item.team}</Text>
+                        <View style={styles.btnDelete}>
+                          <TouchableOpacity
+                            style={styles.btnDeleteTouchable}
+                            onPress={() => _onPressDelete("Delete")}
+                          >
+                            <Text>삭제</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -205,15 +215,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background
-    // backgroundColor: 'orange'
   },
   parentView: {
     flex: 1,
     paddingHorizontal: 10,
     paddingVertical: 10
-    // flexDirection: 'column',
-    // justifyContent: 'center',
-    // backgroundColor: 'yellow'
   },
   textInput: {
     height: 45,
@@ -222,7 +228,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginTop: 10
   },
-  submitButton: {
+  btnAdd: {
     width: 100,
     height: 45,
     backgroundColor: "#FF6E40",
@@ -231,23 +237,32 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   parentItemView: {
-    // backgroundColor:'orange',
     flexDirection: "column",
     paddingHorizontal: 20,
     paddingVertical: 5
   },
   itemView: {
-    // backgroundColor: 'yellow',
     paddingVertical: 5,
     paddingVertical: 5,
     borderWidth: 1
-    // flexDirection: '',
-    // justifyContent: 'flex-start',
+  },
+  parentTeamContainer: {
+    flexDirection: "row"
+  },
+  btnDelete: {
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    width: 60,
+    marginRight: 10
+  },
+  btnDeleteTouchable: {
+    flex: 1,
+    alignItems: "center",
+    width: 40
   },
   btnPressList: {
     borderWidth: 1,
     width: 50,
-    // alignItems:'center',
     margin: 40,
     backgroundColor: "green"
   },
@@ -255,7 +270,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 45,
     backgroundColor: colors.main
-    // backgroundColor:'yellow'
   }
 });
 
