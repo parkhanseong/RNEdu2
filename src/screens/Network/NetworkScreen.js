@@ -48,6 +48,7 @@ class NetworkScreen extends React.Component {
 
   onPressBtnList = async () => {
     try {
+      console.log("onPressBtnList >> ");
       const url = "http://noldam.co.kr:4004/api/auth/test";
       const result = await axios.get(url);
 
@@ -61,7 +62,6 @@ class NetworkScreen extends React.Component {
 
   onChangeText = type => value => {
     const { setMembers } = this.state;
-
     this.setState({
       setMembers: {
         ...setMembers,
@@ -74,26 +74,16 @@ class NetworkScreen extends React.Component {
     this.props.navigation.navigate("NetworkDetail", { item });
   };
 
-  _onPressSwitch = type => value => {
-    const { setMembers } = this.state;
-
-    this.setState({
-      setMembers: {
-        ...setMembers,
-        [type]: value
-      }
-    });
-  };
-
   _onPressSetProfile = () => {
     const data = this.state.setMembers;
     const url = "http://noldam.co.kr:4004/api/auth/test";
-
-    return axios.post(url, data);
+    axios.post(url, data);
+    return this.onPressBtnList();
   };
 
-  _onPressDelete = () => {
+  _onPressDelete = item => {
     Alert.alert("삭제 준비 중");
+    // return axios.delete(`http://noldam.co.kr:4004/api/auth/test/${item.name}`);
   };
 
   render() {
@@ -103,7 +93,6 @@ class NetworkScreen extends React.Component {
       _onPressSetProfile,
       _onPressItemDetail,
       _onPress,
-      _onPressSwitch,
       onChangeText,
       _onPressDelete
     } = this;
@@ -149,7 +138,7 @@ class NetworkScreen extends React.Component {
               <SwitchSelector
                 options={options}
                 initial={0}
-                onPress={_onPressSwitch("gender")}
+                onPress={onChangeText("gender")}
                 fontSize={13}
                 selectedColor="white"
                 buttonColor="#FF6E40"
@@ -172,7 +161,7 @@ class NetworkScreen extends React.Component {
             <TouchableOpacity
               style={styles.btnAdd}
               activeOpacity={0.8}
-              _onPress={() => _onPressSetProfile()}
+              onPress={() => _onPressSetProfile()}
             >
               <Text>추가</Text>
             </TouchableOpacity>
@@ -181,6 +170,7 @@ class NetworkScreen extends React.Component {
           <ScrollView>
             <FlatList
               data={members}
+              numColumns={2}
               keyExtractor={(item, index) => item.name}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => this._onPress(item)}>
@@ -189,11 +179,13 @@ class NetworkScreen extends React.Component {
                       <Text> 이름 : {item.name} </Text>
                       <Text> 성별 : {item.gender === 0 ? "남자" : "여자"}</Text>
                       <View style={styles.parentTeamContainer}>
-                        <Text style={{ flex: 1 }}> 소속 : {item.team}</Text>
+                        <Text style={styles.txtBoxStyle}>
+                          소속 : {item.team}
+                        </Text>
                         <View style={styles.btnDelete}>
                           <TouchableOpacity
                             style={styles.btnDeleteTouchable}
-                            onPress={() => _onPressDelete("Delete")}
+                            onPress={() => _onPressDelete(item)}
                           >
                             <Text>삭제</Text>
                           </TouchableOpacity>
@@ -229,17 +221,19 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   btnAdd: {
-    width: 100,
+    width: 70,
     height: 45,
     backgroundColor: "#FF6E40",
-    marginTop: 20,
+    marginTop: 10,
     alignItems: "center",
     justifyContent: "center"
   },
   parentItemView: {
     flexDirection: "column",
-    paddingHorizontal: 20,
-    paddingVertical: 5
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    width: 180,
+    flex: 2
   },
   itemView: {
     paddingVertical: 5,
@@ -249,10 +243,15 @@ const styles = StyleSheet.create({
   parentTeamContainer: {
     flexDirection: "row"
   },
+  txtBoxStyle: {
+    flex: 1,
+    paddingHorizontal: 4
+  },
   btnDelete: {
+    alignItems: "center",
     paddingHorizontal: 10,
     borderWidth: 1,
-    width: 60,
+    width: 50,
     marginRight: 10
   },
   btnDeleteTouchable: {
