@@ -1,12 +1,12 @@
-import { createAction, handleActions } from "redux-actions";
+import { createAction, handleActions } from 'redux-actions'
 
-const INCREASE = "base/INCREASE";
+const INCREASE = 'base/INCREASE'
 
-export const increaseAction = createAction(INCREASE);
+export const increaseAction = createAction(INCREASE)
 
 const INITIAL_STATE = {
   count: 0
-};
+}
 
 export default handleActions(
   {
@@ -15,4 +15,4 @@ export default handleActions(
     })
   },
   INITIAL_STATE
-);
+)
