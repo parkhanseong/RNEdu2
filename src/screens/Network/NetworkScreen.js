@@ -8,11 +8,17 @@ import {
   ScrollView,
   FlatList,
   Alert,
-  TextInput
+  TextInput,
+  Animated
 } from "react-native";
 import SwitchSelector from "react-native-switch-selector";
 import axios from "axios";
 import { colors } from "../../lib/styleUtils";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import { LoadingView } from "../../container/Base";
+import { ModalView } from "../../container/Base";
+import * as memberActions from "../../redux/modules/member";
 
 class NetworkScreen extends React.Component {
   constructor(props) {
@@ -24,12 +30,31 @@ class NetworkScreen extends React.Component {
         name: "",
         gender: "1",
         team: ""
-      }
+      },
+      modalVisible: false,
+      fadeAnim: new Animated.Value(0)
     };
   }
 
-  componentDidMount() {
-    this.onPressBtnList();
+  //async는 promise를 반환한다.
+  async componentDidMount() {
+    const { MemberActions } = this.props;
+    try {
+      await MemberActions.fetchMembers();
+    } catch (e) {
+      console.log(e);
+    }
+
+    Animated.timing(this.state.fadeAnim, {
+      toValue: 10,
+      duration: 200,
+      delay: 50
+      // ease: Easing.inout()
+    }).start();
+  }
+
+  setModalVisible(visible) {
+    this.setState({ modalVisible: visible });
   }
 
   onPressBtnObject = async () => {
@@ -46,18 +71,16 @@ class NetworkScreen extends React.Component {
     }
   };
 
-  onPressBtnList = async () => {
-    try {
-      console.log("onPressBtnList >> ");
-      const url = "http://noldam.co.kr:4004/api/auth/test";
-      const result = await axios.get(url);
-
-      this.setState({
-        members: result.data
-      });
-    } catch (e) {
-      console.log(e);
-    }
+  onPressBtnList = () => {
+    // try {
+    //   const url = "http://noldam.co.kr:4004/api/auth/test";
+    //   const result = await axios.get(url);
+    //   this.setState({
+    //     members: result.data
+    //   });
+    // } catch (e) {
+    //   console.log(e);
+    // }
   };
 
   onChangeText = type => value => {
@@ -75,18 +98,23 @@ class NetworkScreen extends React.Component {
   };
 
   _onPressSetProfile = () => {
+    // await MemerACtions.postMember(data); // 최종 이렇게 되야 한다.
+
     const data = this.state.setMembers;
     const url = "http://noldam.co.kr:4004/api/auth/test";
     axios.post(url, data);
     return this.onPressBtnList();
   };
 
-  _onPressDelete = item => {
+  _onPressDelete = data => {
     Alert.alert("삭제 준비 중");
-    // return axios.delete(`http://noldam.co.kr:4004/api/auth/test/${item.name}`);
+    // console.log(data);
+    // return axios.delete(`http://noldam.co.kr:4004/api/auth/test/${data}`);
   };
 
   render() {
+    const { members } = this.props;
+
     const {
       onPressBtnObject,
       onPressBtnList,
@@ -98,7 +126,6 @@ class NetworkScreen extends React.Component {
     } = this;
     const {
       singleMember: { gender, name, team },
-      members,
       activeSwitch
     } = this.state;
 
@@ -166,37 +193,40 @@ class NetworkScreen extends React.Component {
               <Text>추가</Text>
             </TouchableOpacity>
           </View>
-
-          <ScrollView>
-            <FlatList
-              data={members}
-              numColumns={2}
-              keyExtractor={(item, index) => item.name}
-              renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => this._onPress(item)}>
-                  <View style={styles.parentItemView}>
-                    <View style={styles.itemView}>
-                      <Text> 이름 : {item.name} </Text>
-                      <Text> 성별 : {item.gender === 0 ? "남자" : "여자"}</Text>
-                      <View style={styles.parentTeamContainer}>
-                        <Text style={styles.txtBoxStyle}>
-                          소속 : {item.team}
+          <Animated.View style={{ opacity: this.state.fadeAnim }}>
+            <ScrollView>
+              <FlatList
+                data={members}
+                numColumns={2}
+                keyExtractor={(item, index) => item.name}
+                renderItem={({ item }) => (
+                  <TouchableOpacity onPress={() => this._onPress(item)}>
+                    <View style={styles.parentItemView}>
+                      <View style={styles.itemView}>
+                        <Text> 이름 : {item.name} </Text>
+                        <Text>
+                          성별 : {item.gender === 0 ? "남자" : "여자"}
                         </Text>
-                        <View style={styles.btnDelete}>
-                          <TouchableOpacity
-                            style={styles.btnDeleteTouchable}
-                            onPress={() => _onPressDelete(item)}
-                          >
-                            <Text>삭제</Text>
-                          </TouchableOpacity>
+                        <View style={styles.parentTeamContainer}>
+                          <Text style={styles.txtBoxStyle}>
+                            소속 : {item.team}
+                          </Text>
+                          <View style={styles.btnDelete}>
+                            <TouchableOpacity
+                              style={styles.btnDeleteTouchable}
+                              onPress={() => _onPressDelete(item)}
+                            >
+                              <Text>삭제</Text>
+                            </TouchableOpacity>
+                          </View>
                         </View>
                       </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              )}
-            />
-          </ScrollView>
+                  </TouchableOpacity>
+                )}
+              />
+            </ScrollView>
+          </Animated.View>
         </View>
       </View>
     );
@@ -272,4 +302,11 @@ const styles = StyleSheet.create({
   }
 });
 
-export default NetworkScreen;
+export default connect(
+  state => ({
+    members: state.member.get("members").toJS()
+  }),
+  dispatch => ({
+    MemberActions: bindActionCreators(memberActions, dispatch)
+  })
+)(NetworkScreen);

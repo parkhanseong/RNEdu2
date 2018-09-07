@@ -5,6 +5,13 @@ const SET_PROFILE = 'button/SET_PROFILE'
 
 export const setProfile = createAction(SET_PROFILE)
 
+export const setProfileAsync = ({ type, value }) => dispatch => {
+  // 1초 뒤 액션 디스패치
+  setTimeout(() => {
+    dispatch(setProfile({ type, value }))
+  }, 1000)
+}
+
 const INITIAL_STATE = {
   name: '',
   age: ''
@@ -13,8 +20,6 @@ const INITIAL_STATE = {
 export default handleActions(
   {
     [SET_PROFILE]: (state, { payload: { type, value } }) => {
-      console.log('>>>>moudle type:' + [type])
-      console.log('>>>>module value:' + value)
       return { ...state, [type]: value }
       // return {[type]: value}
     }
