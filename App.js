@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import { connect } from 'react-redux'
 import * as baseActions from './src/redux/modules/base'
 import { LoadingView } from './src/container/Base'
+import { ErrorModal } from './src/container/Base'
 
 const store = configureStore()
 console.disableYellowBox = true
@@ -16,6 +17,7 @@ const App = () => {
       <View style={styles.container}>
         <MainTab />
         <LoadingView />
+        {/* <ErrorModal /> */}
       </View>
     </Provider>
   )
