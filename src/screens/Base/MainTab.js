@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from 'react-navigation'
 import { Icon } from 'react-native-elements'
 import { TextScreen } from '../../screens/Text'
 import { ImageScreen } from '../../screens/Image'
+import { MoreNavigator } from '../More'
 // import { ImageScreen } from '../../screens/Image'
 // import { TextInputScreen } from '../../screens/TextInput'
 import {
@@ -25,15 +26,15 @@ const MainTab = createBottomTabNavigator(
         )
       }
     },
-    Text: {
-      screen: TextScreen,
-      navigationOptions: {
-        tabBarLabel: 'EXPLORE',
-        tabBarIcon: ({ tintColor }) => (
-          <Icon name='search' type='evilicons' size={28} color={tintColor} />
-        )
-      }
-    },
+    // Text: {
+    //   screen: TextScreen,
+    //   navigationOptions: {
+    //     tabBarLabel: 'EXPLORE',
+    //     tabBarIcon: ({ tintColor }) => (
+    //       <Icon name='search' type='evilicons' size={28} color={tintColor} />
+    //     )
+    //   }
+    // },
     Image: {
       screen: ImageScreen,
       navigationOptions: {
@@ -47,6 +48,15 @@ const MainTab = createBottomTabNavigator(
       screen: ButtonNavigator,
       navigationOptions: {
         tabBarLabel: 'PROFILE',
+        tabBarIcon: ({ tintColor }) => (
+          <Icon name='user' type='feather' size={28} color={tintColor} />
+        )
+      }
+    },
+    More: {
+      screen: MoreNavigator,
+      navigationOptions: {
+        tabBarLabel: '더보기',
         tabBarIcon: ({ tintColor }) => (
           <Icon name='user' type='feather' size={28} color={tintColor} />
         )
