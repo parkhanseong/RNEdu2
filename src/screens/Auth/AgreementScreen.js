@@ -7,35 +7,9 @@ import {
   TouchableOpacity,
   Linking
 } from "react-native";
+import { CheckBox, Document, ButtonNext } from "../../components/Auth";
 import { colors } from "../../lib/styleUtils";
 import { Icon } from "react-native-elements";
-
-const Document = ({ children }) => (
-  <View style={styles._txtInnerBox}>
-    <Text style={styles.txtAgree}>{children}</Text>
-  </View>
-);
-const Document2 = ({ onPress, children }) => (
-  <View style={[styles.txtBoxAgree, { flexDirection: "row" }]}>
-    <TouchableOpacity style={styles.txtInnerBox} onPress={onPress}>
-      <Text style={styles.txtAgree}>{children}</Text>
-    </TouchableOpacity>
-    <Icon name="chevron-right" color="#d1d1d1" style={styles.rightArrow} />
-  </View>
-);
-
-const ButtonNext = ({ isValid, disabled, onPress, children }) => (
-  <TouchableOpacity
-    style={[
-      styles.btnVeriNext,
-      { backgroundColor: isValid ? "#FF6E40" : "gray" }
-    ]}
-    disabled={!disabled}
-    onPress={onPress}
-  >
-    <Text style={styles.footerTxt}>{children}</Text>
-  </TouchableOpacity>
-);
 
 class AgreementScreen extends React.Component {
   state = {
@@ -72,8 +46,8 @@ class AgreementScreen extends React.Component {
   };
 
   handleGoNextscreen = () => {
-    const { checkNecessary } = this.state;
-    this.props.navigation.navigate("Register", { checkNecessary });
+    const { checkMarketing } = this.state;
+    this.props.navigation.navigate("Register", { checkMarketing });
   };
 
   render() {
@@ -86,21 +60,23 @@ class AgreementScreen extends React.Component {
     const { checkAll, checkNecessary, checkMarketing } = this.state;
     const checkAllColor = {
       backgroundColor:
-        checkAll || (checkNecessary && checkMarketing) ? "#FF6E40" : "gray"
+        checkAll || (checkNecessary && checkMarketing)
+          ? "#FF6E40"
+          : "rgb(231, 231, 231)"
     };
     const checkNecessaryColor = {
       backgroundColor: checkAll
         ? "#FF6E40"
         : checkNecessary
           ? "#FF6E40"
-          : "gray"
+          : "rgb(231, 231, 231)"
     };
     const checkMarketingColor = {
       backgroundColor: checkAll
         ? "#FF6E40"
         : checkMarketing
           ? "#FF6E40"
-          : "gray"
+          : "rgb(231, 231, 231)"
     };
 
     return (
@@ -113,59 +89,59 @@ class AgreementScreen extends React.Component {
             paddingHorizontal: 20
           }}
         >
-          <View style={[styles.txtBoxAgreeAll, { marginTop: 30 }]}>
-            <TouchableOpacity
-              style={[styles.checkAllIcon, checkAllColor]}
-              onPress={onPressCheckAll("checkAll")}
-            >
+          <TouchableOpacity
+            style={[styles.txtBoxAgreeAll, { marginTop: 50 }]}
+            onPress={onPressCheckAll("checkAll")}
+          >
+            <View style={[styles.checkAllIcon, checkAllColor]}>
               <Icon name="check" type="feather" size={18} color="white" />
-            </TouchableOpacity>
+            </View>
             <Text style={styles.txtAgreeAll}>이용약관 전체 동의</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={{ alignItems: "center" }}>
           <View style={styles.txtNecessaryBox}>
-            <View style={[styles.txtBoxAgree, { marginTop: 30 }]}>
-              <TouchableOpacity
-                style={[styles.checkIcon, checkNecessaryColor]}
-                onPress={onPressCheck("checkNecessary")}
-              >
-                <Icon name="check" type="feather" size={18} color="white" />
-              </TouchableOpacity>
-              <Document>필수 항목 모두 동의</Document>
-            </View>
-            <Document2 onPress={onPressOpenPdf("service_terms")}>
+            <CheckBox
+              onPress={onPressCheck("checkNecessary")}
+              style={checkNecessaryColor}
+            >
+              필수 항목 모두 동의
+            </CheckBox>
+            <Document onPress={onPressOpenPdf("service_terms")}>
               서비스 이용약관 동의 (필수)
-            </Document2>
-            <Document2 onPress={onPressOpenPdf("privacy_policy")}>
+            </Document>
+            <Document onPress={onPressOpenPdf("privacy_policy")}>
               개인정보 수집 및 이용동의서 (필수)
-            </Document2>
-            <Document2 onPress={onPressOpenPdf("refund_policy")}>
+            </Document>
+            <Document onPress={onPressOpenPdf("refund_policy")}>
               환불 및 취소 약관 (필수)
-            </Document2>
-            <View style={[styles.txtBoxAgree, { marginTop: 30 }]}>
-              <TouchableOpacity
-                style={[styles.checkIcon, checkMarketingColor]}
-                onPress={onPressCheck("checkMarketing")}
-              >
-                <Icon name="check" type="feather" size={18} color="white" />
-              </TouchableOpacity>
-              <Document>마케팅 정보 수신 동의(선택)</Document>
-            </View>
+            </Document>
+            <CheckBox
+              onPress={onPressCheck("checkMarketing")}
+              style={checkMarketingColor}
+            >
+              마케팅 정보 수신 동의(선택)
+            </CheckBox>
 
-            <Document2>혜택 및 이벤트 알림에 동의</Document2>
-            <Text style={[styles.desc, { marginTop: 2 }]}>
-              다양한 혜택과 이벤트 소식을 받을 수 있습니다
+            <View style={[styles.txtBoxEvent]}>
+              <Text style={styles.txtAgree}>혜택 및 이벤트 알림에 동의</Text>
+              <Text style={[styles.desc, { marginLeft: 30 }]}>
+                다양한 혜택과 이벤트 소식을 받을 수 있습니다
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.grayLine} />
+
+          <View>
+            <Text style={[styles.desc, { marginTop: 8 }]}>
+              1. 앱푸시 수신 동의 상태는 앱내 더보기 메뉴에서 변경 가능합니다
+            </Text>
+            <Text style={[styles.desc, { marginTop: 5 }]}>
+              2. 필수 공지사항은 수신동의 여부와 관계없이 전부 발송됩니다.
             </Text>
           </View>
-          <View style={styles.grayLine} />
-          <Text style={[styles.desc, { marginTop: 8 }]}>
-            1. 앱푸시 수신 동의 상태는 앱내 더보기 메뉴에서 변경 가능합니다
-          </Text>
-          <Text style={[styles.desc, { marginTop: 5 }]}>
-            2. 필수 공지사항은 수신동의 여부와 관계없이 전부 발송됩니다.
-          </Text>
         </View>
 
         <ButtonNext
@@ -182,7 +158,8 @@ class AgreementScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: "#FFFFFF"
   },
   checkAllIcon: {
     position: "absolute",
@@ -194,55 +171,33 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   txtNecessaryBox: {
-    alignItems: "flex-start"
-  },
-  checkIcon: {
-    position: "absolute",
-    width: 17,
-    height: 17,
-    left: 27,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "gray"
+    marginTop: 30
   },
   txtBoxAgreeAll: {
-    width: "90%",
-    height: 40,
+    width: "100%",
+    height: 52,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center"
   },
-  txtBoxAgree: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: 300,
-    height: 40
-    // backgroundColor: "yellow"
-  },
   txtAgreeAll: {
-    fontSize: 20
+    fontSize: 17,
+    fontWeight: "bold"
   },
   txtAgree: {
-    fontSize: 17
+    fontSize: 15,
+    marginLeft: 30
   },
-  txtInnerBox: {
-    alignItems: "flex-start",
-    width: 250,
-    marginLeft: 50
+  txtBoxAgree: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: 300,
+    height: 40
   },
-  _txtInnerBox: {
-    alignItems: "flex-start",
-    width: 200
-    // backgroundColor: "green"
-  },
-  btnVeriNext: {
-    width: "100%",
-    height: 70,
-    bottom: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute"
+  txtBoxEvent: {
+    justifyContent: "space-between",
+    width: 300,
+    height: 40
   },
   desc: {
     fontSize: 12,
@@ -254,10 +209,6 @@ const styles = StyleSheet.create({
     width: 300,
     backgroundColor: "gray",
     marginTop: 20
-  },
-  footerTxt: {
-    fontSize: 20,
-    color: "white"
   }
 });
 

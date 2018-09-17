@@ -5,14 +5,12 @@ import AgreementScreen from './AgreementScreen'
 import IntroScreen from '../Auth/IntroScreen'
 import LoginScreen from '../Auth/LoginScreen'
 import RegisterScreen from './RegisterScreen'
-// import  from '../Button'
 
 const AuthNavigator = createStackNavigator(
   {
     Intro: {
       screen: IntroScreen,
       navigationOptions: {
-        // title: '인트로',
         header: null,
         headerBackTitle: ''
       }
@@ -20,7 +18,10 @@ const AuthNavigator = createStackNavigator(
     Agreement: {
       screen: AgreementScreen,
       navigationOptions: {
-        title: '약관 동의'
+        title: '약관 동의',
+        headerStyle: {
+          backgroundColor: 'white'
+        }
       }
     },
     Register: {
