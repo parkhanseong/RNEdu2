@@ -12,13 +12,20 @@ import {
   Easing
 } from "react-native";
 import { colors } from "../../lib/styleUtils";
-import { KakaoButton, FacebookButton } from "../../container/Intro";
+import { KakaoButton, FacebookButton } from "../../components/Auth";
+
+const BACKGROUND_IMAGE_WIDTH = 1013;
+const screenWidth = Dimensions.get("window").width;
+const screenheight = Dimensions.get("window").height;
 
 class IntroScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      movingAnim: new Animated.Value(0)
+      anim: {
+        xValue: new Animated.Value(0),
+        stopAnimation: false
+      }
     };
   }
 
@@ -27,34 +34,46 @@ class IntroScreen extends React.Component {
   }
 
   animate = () => {
-    let { movingAnim } = this.state;
+    let { anim } = this.state;
+
     Animated.sequence([
-      Animated.timing(movingAnim, {
+      Animated.timing(anim.xValue, {
         toValue: 1,
         duration: 30000,
         easing: Easing.linear
       }),
-      Animated.timing(movingAnim, {
+      Animated.timing(anim.xValue, {
         toValue: 0,
         duration: 30000,
         easing: Easing.linear
       })
-    ]).start(() => this.animate());
+    ]).start(() => {
+      if (this.state.anim.stopAnimation === false) {
+        this.animate();
+      }
+    });
+  };
+
+  _stopAnimate = () => {
+    this.state.anim = { stopAnimation: true };
   };
 
   _onPressSignup = () => {
+    this._stopAnimate();
     this.props.navigation.navigate("Agreement");
   };
 
   handleGoMain = () => {
+    this._stopAnimate();
     this.props.navigation.navigate("Login");
   };
 
   render() {
     const { _onPressSignup, handleGoMain } = this;
-    const moving = this.state.movingAnim.interpolate({
-      inputRange: [0, 0.5, 1],
-      outputRange: [-200, -500, -200]
+    const movingValue = BACKGROUND_IMAGE_WIDTH - screenWidth;
+    const moving = this.state.anim.xValue.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, -movingValue]
     });
     return (
       <View style={styles.container}>
@@ -81,9 +100,9 @@ class IntroScreen extends React.Component {
             <View style={{ marginTop: 9 }}>
               <TouchableOpacity
                 onPress={_onPressSignup}
-                style={styles.buttonSimpleSignUp}
+                style={styles.btnSimpleSignUp}
               >
-                <Text style={styles.buttonTextSimpleSignUp}>간편 회원가입</Text>
+                <Text style={styles.btnTextSimpleSignUp}>간편 회원가입</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.btnLogin}>
@@ -141,7 +160,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%"
   },
-  buttonSimpleSignUp: {
+  btnSimpleSignUp: {
     width: "100%",
     height: 40,
     justifyContent: "center",
@@ -157,12 +176,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: "white"
   },
-  buttonTextSimpleSignUp: {
+  btnTextSimpleSignUp: {
     color: "white"
-  },
-  imageWrapper: {
-    width: 30,
-    alignItems: "center"
   },
   btnLogin: {
     justifyContent: "center",

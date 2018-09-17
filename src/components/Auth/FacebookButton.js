@@ -3,30 +3,28 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  Text,
   Image,
+  Text,
   Alert
 } from 'react-native'
 import { colors } from '../../lib/styleUtils'
 
-class KakaoButton extends React.Component {
+class FacebookButton extends React.Component {
   render () {
     return (
-      <View>
-        <TouchableOpacity style={styles.buttonKakao}>
+      <View style={{ marginTop: 9 }}>
+        <TouchableOpacity
+          style={styles.buttonFacebook}
+          onPress={() => {
+            Alert.alert('facebook Login')
+          }}
+          activeOpacity={0.8}
+        >
           <View style={styles.imageWrapper}>
-            <Image
-              style={styles.logo}
-              source={require('../../images/kakao.png')}
-            />
+            <Image source={require('../../images/loginFacebook.png')} />
           </View>
-          <Text
-            style={styles.buttonTextKakao}
-            onPress={() => {
-              Alert.alert('kakao Login')
-            }}
-          >
-            카카오 계정으로 로그인
+          <Text style={styles.buttonTextFacebook}>
+            페이스북 계정으로 로그인
           </Text>
         </TouchableOpacity>
       </View>
@@ -39,12 +37,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background
   },
-  buttonKakao: {
+  buttonFacebook: {
     width: '100%',
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffe253',
+    backgroundColor: '#1369b1',
     flexDirection: 'row',
     borderRadius: 50
   },
@@ -52,17 +50,16 @@ const styles = StyleSheet.create({
     width: 30,
     alignItems: 'center'
   },
-  buttonTextKakao: {
+  buttonTextFacebook: {
     width: 130,
     fontSize: 11,
     textAlign: 'center',
-    color: '#3A1E1E',
-    borderRadius: 50
+    color: 'white'
   },
   logo: {
-    width: 22,
-    height: 21
+    width: 25,
+    height: 22
   }
 })
 
-export default KakaoButton
+export default FacebookButton
