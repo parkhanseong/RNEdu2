@@ -59,9 +59,9 @@ class RegisterScreen extends React.Component {
 
   _onChangeText = type => value => {
     const isValid = this.checkValidation(type, value);
-    const { signActions } = this.props;
+    const { SignActions } = this.props;
 
-    signActions.setSign({ type, value, isValid });
+    SignActions.setSign({ type, value, isValid });
 
     this.setState({
       [type]: { value, isValid }
@@ -87,7 +87,7 @@ class RegisterScreen extends React.Component {
   };
 
   // 인증 버튼 클릭시
-  _onPress = () => {
+  _onPressVerify = () => {
     const { verifyNum, getVerifyNum } = this.state;
 
     if (
@@ -99,7 +99,21 @@ class RegisterScreen extends React.Component {
         verifiedHPNum_2: false
       });
     } else {
-      Alert.alert("인증번호를 잘 못 입력하셨습니다. 다시 입력해주세요.");
+      Alert.alert(
+        null,
+        "인증번호를 잘 못 입력하셨습니다. \n다시 입력해주세요.",
+        [
+          {
+            text: "취소",
+            onPress: () => {},
+            style: "destructive"
+          },
+          {
+            text: "확인",
+            onPress: () => {}
+          }
+        ]
+      );
     }
   };
 
@@ -129,22 +143,22 @@ class RegisterScreen extends React.Component {
 
   //다음 버튼 클릭시 > 로그인 화면으로 이동
   handleGoNextscreen = () => {
-    const checkNecessary = this.props.navigation.getParam("checkNecessary");
+    const checkMarketing = this.props.navigation.getParam("checkMarketing");
     const url = "http://noldamapp.com:5000/account";
     const { name, phone, pwd } = this.state;
     const data = {
       name: name.value,
       phone: phone.value,
       pwd: pwd.value,
-      agreement: checkNecessary
+      agreement: checkMarketing
     };
 
     try {
       axios
         .post(url, data)
         .then(response => {
-          return response.data.message;
-          console.log(response.data.message);
+          console.log(response.data);
+          return response.data;
         })
         .catch(err => {
           console.log(err);
@@ -179,7 +193,7 @@ class RegisterScreen extends React.Component {
       handleAlert,
       onEndEditing,
       onMoveScreen,
-      _onPress,
+      _onPressVerify,
       handleGoNextscreen
     } = this;
     const remote =
@@ -188,18 +202,22 @@ class RegisterScreen extends React.Component {
     const verifiedDone =
       name.isValid && phone.isValid && pwd.isValid && pwdConfirm.isValid;
     const buttonStyle = {
-      backgroundColor: verifiedDone ? "#FF6E40" : "#999"
+      backgroundColor: verifiedDone ? "#FF6E40" : "rgb(231, 231, 231)"
     };
     const borderOptionStyle = isValid => ({
-      borderColor: isValid || isValid === null ? "black" : "red"
+      borderColor: isValid || isValid === null ? "black" : "#FF6E40"
     });
     const verifyButtonStyle = isValid => ({
-      color: verifyNum.isValid ? "red" : "#999"
+      color: verifyNum.isValid ? "#FF6E40" : "rgb(231, 231, 231)"
     });
 
-    const strPwdConfirmValid = pwdConfirm.isValid
-      ? "비밀번호가 일치합니다"
-      : "비밀번호가 일치하지 않습니다";
+    const strPwdConfirmValid =
+      pwdConfirm.isValid && pwd.isValid
+        ? "비밀번호가 일치합니다"
+        : "비밀번호가 일치하지 않습니다";
+
+    const editable =
+      verifiedPwd === true && verifiedHPNum_2 === false ? false : true;
 
     return (
       <View style={styles.container}>
@@ -207,10 +225,10 @@ class RegisterScreen extends React.Component {
           <View>
             <Text>이름</Text>
             <View
-              style={[styles.textInputView, borderOptionStyle(name.isValid)]}
+              style={[styles.txtInputView, borderOptionStyle(name.isValid)]}
             >
               <TextInput
-                style={[styles.textInputStyle]}
+                style={[styles.txtInputStyle]}
                 maxLength={6}
                 placeholder="이름을 입력해주세요"
                 onChangeText={_onChangeText("name")}
@@ -233,10 +251,14 @@ class RegisterScreen extends React.Component {
             <Text style={styles.marginTop_1}>휴대폰 번호 </Text>
             {/* / 글자수({this.state.phoneNumLength}) */}
             <View
-              style={[styles.textInputView, borderOptionStyle(phone.isValid)]}
+              style={[
+                styles.txtInputView,
+                borderOptionStyle(phone.isValid),
+                { backgroundColor: editable === false ? "gray" : null }
+              ]}
             >
               <TextInput
-                style={[styles.textInputStyle]}
+                style={[styles.txtInputStyle]}
                 maxLength={11}
                 placeholder="휴대폰 번호를 입력해주세요"
                 keyboardType="number-pad"
@@ -244,6 +266,7 @@ class RegisterScreen extends React.Component {
                 onChangeText={_onChangeText("phone")}
                 clearButtonMode="while-editing"
                 onEndEditing={onEndEditing}
+                editable={editable}
               />
               {phone.isValid === null ? null : (
                 <Icon
@@ -279,7 +302,7 @@ class RegisterScreen extends React.Component {
                   </View>
                   <View style={styles.inputVeriNum}>
                     <TextInput
-                      style={styles.textInputVeri}
+                      style={styles.txtInputVeri}
                       maxLength={6}
                       placeholder="인증번호 6자리 입력"
                       keyboardType="number-pad"
@@ -296,7 +319,7 @@ class RegisterScreen extends React.Component {
                           styles.textInput,
                           verifyButtonStyle(verifyNum.isValid)
                         ]}
-                        onPress={_onPress}
+                        onPress={_onPressVerify}
                       >
                         인증
                       </Text>
@@ -312,12 +335,12 @@ class RegisterScreen extends React.Component {
                   <Text style={styles.marginTop_1}>비밀번호 설정</Text>
                   <View
                     style={[
-                      styles.textInputView,
+                      styles.txtInputView,
                       borderOptionStyle(pwd.isValid)
                     ]}
                   >
                     <TextInput
-                      style={[styles.textInputStyle]}
+                      style={[styles.txtInputStyle]}
                       maxLength={20}
                       value={pwd.value}
                       placeholder="비밀번호를 입력해주세요"
@@ -344,12 +367,12 @@ class RegisterScreen extends React.Component {
                   <Text style={styles.marginTop_1}>비밀번호 재확인</Text>
                   <View
                     style={[
-                      styles.textInputView,
+                      styles.txtInputView,
                       borderOptionStyle(pwdConfirm.isValid)
                     ]}
                   >
                     <TextInput
-                      style={[styles.textInputStyle]}
+                      style={[styles.txtInputStyle]}
                       maxLength={20}
                       value={pwdConfirm.value}
                       placeholder="비밀번호를 입력해주세요"
@@ -397,24 +420,25 @@ class RegisterScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: "white"
   },
   parentView: {
     flex: 1,
     paddingHorizontal: 30,
     paddingVertical: 30
   },
-  textInputView: {
+  txtInputView: {
     flexDirection: "row",
     height: 45,
     borderWidth: 1,
     paddingHorizontal: 10,
     marginTop: 10
   },
-  textInputStyle: {
+  txtInputStyle: {
     flex: 1
   },
-  textInputVeri: {
+  txtInputVeri: {
     height: 40,
     width: 150,
     paddingHorizontal: 10,
@@ -474,7 +498,6 @@ const styles = StyleSheet.create({
   },
   btnVeriNext: {
     height: 70,
-    backgroundColor: "#FF6E40",
     alignItems: "center",
     justifyContent: "center"
   },
@@ -487,21 +510,12 @@ const styles = StyleSheet.create({
   footerTxt: {
     fontSize: 20,
     color: "white"
-  },
-  backgroundImage: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0
   }
 });
 
 export default connect(
   null,
   dispatch => ({
-    signActions: bindActionCreators(signActions, dispatch)
+    SignActions: bindActionCreators(signActions, dispatch)
   })
 )(RegisterScreen);
-
-// export default SignScreen
