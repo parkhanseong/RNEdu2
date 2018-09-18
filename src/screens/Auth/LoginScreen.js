@@ -14,39 +14,52 @@ import {
   StackNavigator,
   createStackNavigator
 } from "react-navigation";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import { MainTab } from "../../screens/base";
 import { SignNavigator } from "../../screens/Sign";
-
+import * as signActions from "../../redux/modules/sign";
 class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      value: "",
-      //p 소문자 수정
-      phoneNum: "",
-      secretNum: "",
-      //(인증 체크)
-      verified: false
+      phone: {
+        value: "",
+        isValid: null
+      },
+      pwd: {
+        value: "",
+        isValid: null
+      }
     };
   }
 
   onChangeText = type => value => {
-    if (type === "phone" && value.length === 11) {
-      this.setState({
-        [type]: value,
-        verified: true
-      });
-    } else {
-      this.setState({
-        [type]: value,
-        verified: false
-      });
-    }
+    const isValid = this.checkValidation(type, value);
+
+    const { SignActions } = this.props;
+    SignActions.setSign({ type, value });
 
     this.setState({
-      [type]: value
+      [type]: { value, isValid }
     });
+  };
+
+  checkValidation = (type, value) => {
+    let isValid = null;
+
+    switch (type) {
+      case "phone":
+        isValid = value.length === 11 ? true : false;
+        break;
+      case "pwd":
+        isValid = value.length >= 8 && value.length <= 20;
+        break;
+      default:
+        break;
+    }
+    return isValid;
   };
 
   handleAlert = () => {
@@ -62,7 +75,7 @@ class LoginScreen extends React.Component {
   };
 
   render() {
-    const { value, phoneNum, secretNum, verified } = this.state;
+    const { phone, pwd } = this.state;
     const {
       onChangeText,
       handleAlert,
@@ -70,19 +83,23 @@ class LoginScreen extends React.Component {
       handleGoMain,
       onMoveScreen
     } = this;
-    const remote =
-      "http://img.kormedi.com/news/article/__icsFiles/afieldfile/2012/05/29/0529childer_c.jpg";
+
+    const verifiedDone = phone.isValid && pwd.isValid;
+    const loginVerify = {
+      backgroundColor: verifiedDone ? "#FF6E40" : "rgb(231, 231, 231)"
+    };
 
     return (
       <View style={styles.container}>
         <View style={styles.parentView}>
           <View>
-            <Text>휴대폰 번호</Text>
+            <Text style={{ fontSize: 15 }}>휴대폰 번호</Text>
             <TextInput
               style={styles.textInput}
               placeholder="휴대폰 번호를 입력해주세요"
+              maxLength={11}
               keyboardType="number-pad"
-              value={phoneNum}
+              value={phone.value}
               onChangeText={onChangeText("phone")}
               autoCapitalize="none"
               autoCorrect={false}
@@ -91,13 +108,13 @@ class LoginScreen extends React.Component {
             />
           </View>
           <View>
-            <Text style={styles.marginTop_1}>비밀번호</Text>
+            <Text style={[styles.marginTop_1, { fontSize: 15 }]}>비밀번호</Text>
             <TextInput
               style={styles.textInput}
               placeholder="비밀번호를 입력해주세요"
-              keyboardType="number-pad"
-              value={secretNum}
-              onChangeText={onChangeText("secretNum")}
+              value={pwd.value}
+              maxLength={20}
+              onChangeText={onChangeText("pwd")}
               autoCapitalize="none"
               autoCorrect={false}
               returnKeyType="done"
@@ -106,38 +123,18 @@ class LoginScreen extends React.Component {
               onEndEditing={onEndEditing}
             />
           </View>
-          <View
-            style={{
-              justifyContent: "flex-start",
-              flexDirection: "row",
-              justifyContent: "space-around",
-              marginTop: 10,
-              // backgroundColor: 'black',
-              paddingHorizontal: 70
-            }}
-          >
-            <Text
-              style={{
-                textDecorationLine: "underline",
-                color: "gray"
-              }}
-              onPress={handleAlert}
-            >
+          <View style={styles.pwdView}>
+            <Text style={styles.txtFindPwd} onPress={handleAlert}>
               비밀번호 찾기
-            </Text>
-            <Text
-              style={{
-                textDecorationLine: "underline",
-                color: "gray"
-              }}
-              onPress={onMoveScreen("sign")}
-            >
-              회원가입
             </Text>
           </View>
         </View>
         <View>
-          <TouchableOpacity style={styles.footerBtn} onPress={handleGoMain}>
+          <TouchableOpacity
+            style={[styles.footerBtn, loginVerify]}
+            onPress={handleGoMain}
+            disabled={verifiedDone ? false : true}
+          >
             <Text style={styles.footerTxt} onPress={handleGoMain}>
               로그인하기
             </Text>
@@ -150,12 +147,13 @@ class LoginScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: "white"
   },
   parentView: {
     flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 30
+    paddingHorizontal: 30,
+    marginTop: 40
   },
   textInput: {
     height: 45,
@@ -163,7 +161,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginTop: 10
   },
-  txtFindPwd: {},
+  pwdView: {
+    justifyContent: "flex-start",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 10,
+    paddingHorizontal: 70
+  },
+  txtFindPwd: {
+    textDecorationLine: "underline",
+    color: "gray",
+    marginTop: 10
+  },
   txtTitle: {},
   txtDesc: {},
   imgBackground: {
@@ -181,12 +190,11 @@ const styles = StyleSheet.create({
   },
   footerBtn: {
     height: 70,
-    backgroundColor: "#FF6E40",
     alignItems: "center",
     justifyContent: "center"
   },
   footerTxt: {
-    fontSize: 20,
+    fontSize: 18,
     color: "white"
   },
   backgroundImage: {
@@ -198,6 +206,10 @@ const styles = StyleSheet.create({
   }
 });
 
-// const SignNavigator = StackNavigator({ SignOn: SignNavigator });
-
-export default LoginScreen;
+// export default LoginScreen;
+export default connect(
+  null,
+  dispatch => ({
+    SignActions: bindActionCreators(signActions, dispatch)
+  })
+)(LoginScreen);
