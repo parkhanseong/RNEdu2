@@ -27,13 +27,19 @@ const AuthNavigator = createStackNavigator(
     Register: {
       screen: RegisterScreen,
       navigationOptions: {
-        title: '회원 가입'
+        title: '회원 가입',
+        headerStyle: {
+          backgroundColor: 'white'
+        }
       }
     },
     Login: {
       screen: LoginScreen,
       navigationOptions: {
-        title: '로그인'
+        title: '로그인',
+        headerStyle: {
+          backgroundColor: 'white'
+        }
       }
     }
   },
