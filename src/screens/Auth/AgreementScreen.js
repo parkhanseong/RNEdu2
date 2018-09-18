@@ -81,16 +81,9 @@ class AgreementScreen extends React.Component {
 
     return (
       <View style={styles.container}>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            height: 52,
-            paddingHorizontal: 20
-          }}
-        >
+        <View style={{ alignItems: "center" }}>
           <TouchableOpacity
-            style={[styles.txtBoxAgreeAll, { marginTop: 50 }]}
+            style={[styles.txtBoxAgreeAll]}
             onPress={onPressCheckAll("checkAll")}
           >
             <View style={[styles.checkAllIcon, checkAllColor]}>
@@ -170,15 +163,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center"
   },
-  txtNecessaryBox: {
-    marginTop: 30
-  },
   txtBoxAgreeAll: {
-    width: "100%",
+    width: "80%",
     height: 52,
     borderWidth: 1,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    marginTop: 30
   },
   txtAgreeAll: {
     fontSize: 17,
