@@ -1,11 +1,11 @@
 import { createAction, handleActions } from 'redux-actions'
 import { List, Map, fromJS } from 'immutable'
 import * as RegisterAPI from '../../lib/api/register'
+import { removeDash } from '../../lib/formatUtil'
 
 const SET_SIGN = 'sign/SET_SIGN'
 
 export const setSign = createAction(SET_SIGN)
-// export const setSign = createAction(SET_SIGN, RegisterAPI.postRegister)
 
 const INITIAL_STATE = Map({
   name: Map({
@@ -30,6 +30,11 @@ export default handleActions(
   {
     [SET_SIGN]: (state, { payload: data }) => {
       const { type } = data
+
+      if (type === 'phone') {
+        data.value = removeDash(data.value)
+      }
+
       return state.set(type, fromJS(data))
     }
   },
