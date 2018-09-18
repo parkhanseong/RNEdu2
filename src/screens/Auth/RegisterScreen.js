@@ -17,6 +17,7 @@ import * as signActions from "../../redux/modules/sign";
 import { createStackNavigator, StackNavigator } from "react-navigation";
 import axios from "axios";
 import register from "../../lib/api/register";
+import { PhoneFormat, removeDash } from "../../lib/formatUtil";
 
 class RegisterScreen extends React.Component {
   constructor(props) {
@@ -63,9 +64,14 @@ class RegisterScreen extends React.Component {
 
     SignActions.setSign({ type, value, isValid });
 
+    if (type === "phone") {
+      var value = PhoneFormat(value);
+    }
+
     this.setState({
       [type]: { value, isValid }
     });
+
     this._handleLayout(type, value);
   };
 
@@ -124,13 +130,17 @@ class RegisterScreen extends React.Component {
         isValid = value.length >= 2 && value.length <= 6;
         break;
       case "phone":
+        var value = removeDash(value);
         isValid = value.length === 11;
         break;
       case "pwd":
         isValid = value.length >= 8 && value.length <= 20;
         break;
       case "pwdConfirm":
-        isValid = this.state.pwd.value === value;
+        isValid =
+          this.state.pwd.value === value &&
+          value.length >= 8 &&
+          value.length <= 20;
         break;
       case "verifyNum":
         isValid = value.length === 6;
@@ -196,11 +206,13 @@ class RegisterScreen extends React.Component {
       _onPressVerify,
       handleGoNextscreen
     } = this;
-    const remote =
-      "http://img.kormedi.com/news/article/__icsFiles/afieldfile/2012/05/29/0529childer_c.jpg";
 
     const verifiedDone =
-      name.isValid && phone.isValid && pwd.isValid && pwdConfirm.isValid;
+      name.isValid &&
+      phone.isValid &&
+      pwd.isValid &&
+      pwdConfirm.isValid &&
+      pwd.value === pwdConfirm.value;
     const buttonStyle = {
       backgroundColor: verifiedDone ? "#FF6E40" : "rgb(231, 231, 231)"
     };
@@ -212,7 +224,7 @@ class RegisterScreen extends React.Component {
     });
 
     const strPwdConfirmValid =
-      pwdConfirm.isValid && pwd.isValid
+      pwdConfirm.isValid && pwd.isValid && pwd.value === pwdConfirm.value
         ? "비밀번호가 일치합니다"
         : "비밀번호가 일치하지 않습니다";
 
@@ -247,6 +259,7 @@ class RegisterScreen extends React.Component {
               )}
             </View>
           </View>
+
           <View>
             <Text style={styles.marginTop_1}>휴대폰 번호 </Text>
             {/* / 글자수({this.state.phoneNumLength}) */}
@@ -259,11 +272,13 @@ class RegisterScreen extends React.Component {
             >
               <TextInput
                 style={[styles.txtInputStyle]}
-                maxLength={11}
+                maxLength={13}
                 placeholder="휴대폰 번호를 입력해주세요"
                 keyboardType="number-pad"
                 value={phone.value}
                 onChangeText={_onChangeText("phone")}
+                autoCorrect={false}
+                returnKeyType="done"
                 clearButtonMode="while-editing"
                 onEndEditing={onEndEditing}
                 editable={editable}
