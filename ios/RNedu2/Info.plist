@@ -49,6 +49,11 @@
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
 			</dict>
+			<key>noldamapp.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
 			<key>noldam.co.kr</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>

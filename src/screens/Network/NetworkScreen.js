@@ -18,6 +18,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { LoadingView } from "../../container/Base";
 import { ModalView } from "../../container/Base";
+import { ErrorModal } from "../../container/Base";
 import * as memberActions from "../../redux/modules/member";
 
 class NetworkScreen extends React.Component {
@@ -112,6 +113,12 @@ class NetworkScreen extends React.Component {
     // return axios.delete(`http://noldam.co.kr:4004/api/auth/test/${data}`);
   };
 
+  _onPressOpenModal = () => {
+    // Alert.alert("1");
+    this.props.navigation.navigate("ModalScreen");
+    // return <ModalView />;
+  };
+
   render() {
     const { members } = this.props;
 
@@ -122,7 +129,8 @@ class NetworkScreen extends React.Component {
       _onPressItemDetail,
       _onPress,
       onChangeText,
-      _onPressDelete
+      _onPressDelete,
+      _onPressOpenModal
     } = this;
     const {
       singleMember: { gender, name, team },
@@ -147,6 +155,14 @@ class NetworkScreen extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.parentView}>
+          <TouchableOpacity
+            style={styles.btnAdd}
+            activeOpacity={0.8}
+            onPress={() => _onPressOpenModal()}
+          >
+            <Text>오류모달test</Text>
+          </TouchableOpacity>
+
           <View>
             <Text>이름</Text>
             <TextInput
