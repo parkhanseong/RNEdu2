@@ -6,11 +6,8 @@ class RequestTicket extends React.Component {
   render () {
     const { isSelected, onPress } = this.props
 
-    console.log('isSelected >>> ')
-    console.log(isSelected)
-
-    const pickColor_L = isSelected.value === 'L' ? '#FF6E40' : '#000000'
-    const pickColor_S = isSelected.value === 'S' ? '#FF6E40' : '#000000'
+    const pickColor_L = isSelected === 'L' ? '#FF6E40' : '#000000'
+    const pickColor_S = isSelected === 'S' ? '#FF6E40' : '#000000'
 
     return (
       <View style={styles.container}>
@@ -46,7 +43,7 @@ class RequestTicket extends React.Component {
             </TouchableOpacity>
           </View>
 
-          {isSelected.value === 'L' ? (
+          {isSelected === 'L' ? (
             <View style={{ marginLeft: 22.5 }}>
               <Text style={{ color: '#FF6E40' }}>
                 ∙ 정기권 놀이는 4주 단위로 계약됩니다.

@@ -8,12 +8,6 @@ import {
   Button,
   substr
 } from "react-native";
-// import RadioForm, {
-//   RadioButton,
-//   RadioButtonInput,
-//   RadioButtonLabel
-// } from "react-native-simple-radio-button";
-// import DatePicker from "react-native-datepicker";
 import { colors, customStyle } from "../../lib/styleUtils";
 import { ButtonNext } from "../../components/Auth";
 import {
@@ -24,19 +18,16 @@ import {
   SelectPeriodTime
 } from "../../components/Request";
 import { moment } from "../../lib/timeUtil";
+import * as requestActions from "../../redux/modules/request";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 
 class RequestFormScreen extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      pickTicket: {
-        value: "L"
-      },
-      pickDayOfWeek: {
-        day: "",
-        set: ""
-      },
+      pickTicket: "L",
       mDayOfWeek: "0000000",
       radioValue: "",
       initDate: moment().format("YYYY[년] MM[월] DD[일] (ddd)"),
@@ -54,6 +45,27 @@ class RequestFormScreen extends React.Component {
         .minute(0),
       addTime: 2
     };
+  }
+
+  componentDidMount() {
+    console.log(">>>>componentDidMount");
+    var { reqeustTicketInfo } = this.props;
+
+    reqeustTicketInfo =
+      reqeustTicketInfo === undefined ? undefined : reqeustTicketInfo.toJS();
+
+    if (reqeustTicketInfo != undefined) {
+      this.setState({
+        ...this.state,
+        pickTicket: reqeustTicketInfo.pickTicket,
+        mDayOfWeek: reqeustTicketInfo.mDayOfWeek,
+        daysArr: reqeustTicketInfo.daysArr,
+        fromDate: reqeustTicketInfo.fromDate,
+        fromTime: reqeustTicketInfo.fromTime,
+        toTime: reqeustTicketInfo.toTime,
+        periodTime: reqeustTicketInfo.periodTime
+      });
+    }
   }
 
   handleDayOfWeek = day => () => {
@@ -75,11 +87,14 @@ class RequestFormScreen extends React.Component {
   _onPressPickTicket = type => () => {
     const value = type === "season" ? "L" : "S";
     this.setState({
-      pickTicket: { value }
+      pickTicket: value
     });
   };
 
   onPeriodTimeChange = (type, date) => {
+    // console.log("type >>>");
+    // console.log(type);
+
     const { fromTime } = this.state;
     var { addTime } = this.state;
 
@@ -125,7 +140,14 @@ class RequestFormScreen extends React.Component {
   };
 
   _onPressRequestService = () => {
-    const { pickTicket, mDayOfWeek, fromDate, fromTime, toTime } = this.state;
+    const {
+      pickTicket,
+      mDayOfWeek,
+      fromDate,
+      fromTime,
+      toTime,
+      periodTime
+    } = this.state;
 
     const dayArr = ["월", "화", "수", "목", "금", "토", "일"];
     var strArray = [];
@@ -144,13 +166,17 @@ class RequestFormScreen extends React.Component {
     }
 
     const data = {
-      pickTicket: pickTicket.value,
+      pickTicket: pickTicket,
       mDayOfWeek: mDayOfWeek,
       daysArr: daysArr.join(", "),
       fromDate: fromDate,
       fromTime: fromTime,
-      toTime: toTime
+      toTime: toTime,
+      periodTime: periodTime
     };
+
+    const { requestActions } = this.props;
+    requestActions.setRequestTicketInfo(data);
 
     this.props.navigation.navigate("Request", { data: data });
   };
@@ -185,6 +211,7 @@ class RequestFormScreen extends React.Component {
 
     return (
       <View style={styles.container}>
+        {/* 이용권 선택 */}
         <RequestTicket isSelected={pickTicket} onPress={_onPressPickTicket} />
         <View style={styles.viewTimeRequest}>
           <View style={styles.viewPlayTicket}>
@@ -271,4 +298,18 @@ const styles = StyleSheet.create({
   }
 });
 
-export default RequestFormScreen;
+// export default RequestFormScreen;
+export default connect(
+  state => (
+    console.log(state.request.get("reqeustTicketInfo")),
+    {
+      reqeustTicketInfo: state.request.get("reqeustTicketInfo")
+    }
+  ),
+  // state => ({
+  //   members: state.member.get("members").toJS()
+  // }),
+  dispatch => ({
+    requestActions: bindActionCreators(requestActions, dispatch)
+  })
+)(RequestFormScreen);
