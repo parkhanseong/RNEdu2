@@ -3,11 +3,9 @@ import { StyleSheet, View } from 'react-native'
 import { LoginScreen, LoginNavigator } from './src/screens/Login'
 import { MainTab } from './src/screens/base'
 import configureStore from './src/redux/configureStore'
-import { Provider } from 'react-redux'
-import { connect } from 'react-redux'
+import { Provider, connect } from 'react-redux'
 import * as baseActions from './src/redux/modules/base'
-import { LoadingView } from './src/container/Base'
-import { ErrorModal } from './src/container/Base'
+import { LoadingView, ErrorModal } from './src/container/Base'
 import { RootNavigator } from './src/screens/base'
 
 const store = configureStore()

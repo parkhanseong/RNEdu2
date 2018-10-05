@@ -29,7 +29,7 @@ class DayOfWeek extends React.Component {
               styles.selectedDayOfWeek,
               { backgroundColor: btnBgcMonday }
             ]}
-            onPress={onPress('0')}
+            onPress={onPress('dayOfWeek', '0')}
           >
             <Text>월</Text>
           </TouchableOpacity>
@@ -39,7 +39,7 @@ class DayOfWeek extends React.Component {
               styles.selectedDayOfWeek,
               { backgroundColor: btnBgcTuesday }
             ]}
-            onPress={onPress('1')}
+            onPress={onPress('dayOfWeek', '1')}
           >
             <Text>화</Text>
           </TouchableOpacity>
@@ -48,7 +48,7 @@ class DayOfWeek extends React.Component {
               styles.selectedDayOfWeek,
               { backgroundColor: btnBgcWednesday }
             ]}
-            onPress={onPress('2')}
+            onPress={onPress('dayOfWeek', '2')}
           >
             <Text>수</Text>
           </TouchableOpacity>
@@ -57,7 +57,7 @@ class DayOfWeek extends React.Component {
               styles.selectedDayOfWeek,
               { backgroundColor: btnBgcThursday }
             ]}
-            onPress={onPress('3')}
+            onPress={onPress('dayOfWeek', '3')}
           >
             <Text>목</Text>
           </TouchableOpacity>
@@ -66,7 +66,7 @@ class DayOfWeek extends React.Component {
               styles.selectedDayOfWeek,
               { backgroundColor: btnBgcFriday }
             ]}
-            onPress={onPress('4')}
+            onPress={onPress('dayOfWeek', '4')}
           >
             <Text>금</Text>
           </TouchableOpacity>
@@ -75,7 +75,7 @@ class DayOfWeek extends React.Component {
               styles.selectedDayOfWeek,
               { backgroundColor: btnBgcSaturday }
             ]}
-            onPress={onPress('5')}
+            onPress={onPress('dayOfWeek', '5')}
           >
             <Text>토</Text>
           </TouchableOpacity>
@@ -84,7 +84,7 @@ class DayOfWeek extends React.Component {
               styles.selectedDayOfWeek,
               { backgroundColor: btnBgcSunday }
             ]}
-            onPress={onPress('6')}
+            onPress={onPress('dayOfWeek', '6')}
           >
             <Text>일</Text>
           </TouchableOpacity>

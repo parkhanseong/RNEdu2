@@ -1,16 +1,19 @@
 import React, { Component } from 'react'
 import { createSwitchNavigator } from 'react-navigation'
 import MainTab from './MainTab'
-// import LoadScreen from './LoadScreen'
-// import Auth from '../Auth/Auth'
 import IntroScreen from './IntroScreen'
 import SignNavigator from '../Sign'
 import { AuthNavigator } from '../Auth'
-// import PermissionScreen from './PermissionScreen'
-// import { customStyle } from '../../lib/utils'
+import RequestScreen from '../Request/RequestNavigator'
 
 const RootNavigator = createSwitchNavigator(
   {
+    Request: {
+      screen: RequestScreen,
+      navigationOptions: {
+        title: '신청서 작성'
+      }
+    },
     Auth: {
       screen: AuthNavigator,
       navigationOptions: {
@@ -24,32 +27,6 @@ const RootNavigator = createSwitchNavigator(
         header: null
       }
     }
-    // Load: {
-    //   screen: LoadScreen,
-    //   navigationOptions: {
-    //     header: null
-    //   }
-    // },
-    // Introduce: {
-    //   screen: IntroScreen,
-    //   navigationOptions: {
-    //     header: null
-    //   }
-    // },
-    // Auth: {
-    //   screen: Auth,
-    //   navigationOptions: {
-    //     header: null,
-    //     headerBackTitle: '로그인'
-    //   }
-    // },
-    // Sign: {
-    //   screen: SignNavigator,
-    //   key: 'Sign',
-    //   navigationOptions: {
-    //     header: null
-    //   }
-    // }
   },
   {}
 )

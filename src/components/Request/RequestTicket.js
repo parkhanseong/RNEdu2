@@ -20,7 +20,7 @@ class RequestTicket extends React.Component {
           <View style={styles.viewBtnOption}>
             <TouchableOpacity
               style={[styles.btnOption, { borderColor: pickColor_L }]}
-              onPress={onPress('season')}
+              onPress={onPress('season', 'L')}
             >
               <Text style={[styles.txtServiceTitle, { color: pickColor_L }]}>
                 정기권
@@ -32,7 +32,7 @@ class RequestTicket extends React.Component {
 
             <TouchableOpacity
               style={[styles.btnOption, { borderColor: pickColor_S }]}
-              onPress={onPress('single')}
+              onPress={onPress('single', 'S')}
             >
               <Text style={[styles.txtServiceTitle, { color: pickColor_S }]}>
                 단발권
