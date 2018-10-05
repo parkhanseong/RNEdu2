@@ -124,22 +124,21 @@ class RequestScreen extends React.Component {
             <View style={styles.txtReqInfo}>
               <Text>시작 날짜</Text>
               <Text>
-                {moment(fromDate).format("YYYY[년] MM[월] DD[일] (ddd)") ===
-                null
+                {moment(fromDate).format(FROMDATE_FORMAT) === null
                   ? ""
-                  : moment(fromDate).format("YYYY[년] MM[월] DD[일] (ddd)")}
+                  : moment(fromDate).format(FROMDATE_FORMAT)}
               </Text>
             </View>
             <View style={styles.txtReqInfo}>
               <Text>시작 시간</Text>
               <Text>
-                {moment(fromTime).format("A hh:mm") === null
+                {moment(fromTime).format(FROMTIME_FORMAT) === null
                   ? ""
-                  : moment(fromTime).format("A hh:mm")}{" "}
+                  : moment(fromTime).format(FROMTIME_FORMAT)}{" "}
                 ~{" "}
-                {moment(toTime).format("A hh:mm") === null
+                {moment(toTime).format(FROMTIME_FORMAT) === null
                   ? ""
-                  : moment(toTime).format("A hh:mm")}
+                  : moment(toTime).format(FROMTIME_FORMAT)}
               </Text>
             </View>
 
@@ -158,26 +157,28 @@ class RequestScreen extends React.Component {
   }
 }
 
+const FROMDATE_FORMAT = "YYYY[년] MM[월] DD[일] (ddd)";
+const FROMTIME_FORMAT = "A hh:mm";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "rgb(244, 244, 244)"
+    backgroundColor: "#f4f4f4"
   },
   txtNotice: {
-    backgroundColor: "rgb(244, 244, 244)",
+    backgroundColor: "#f4f4f4",
     ...customStyle.center,
     height: 70
   },
   txtTitle: {
     marginTop: 10,
-    backgroundColor: "rgb(255, 255, 255)",
+    backgroundColor: "#ffffff",
     justifyContent: "center",
     height: 50,
     paddingHorizontal: 10
   },
   txtReqInfo: {
     marginTop: 1,
-    backgroundColor: "rgb(255, 255, 255)",
+    backgroundColor: "#ffffff",
     alignItems: "center",
     height: 50,
     flexDirection: "row",
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
   },
   btnDelete: {
     marginTop: 10,
-    backgroundColor: "rgb(255, 255, 255)",
+    backgroundColor: "#ffffff",
     ...customStyle.center,
     height: 50,
     paddingHorizontal: 10
@@ -196,20 +197,20 @@ const styles = StyleSheet.create({
     fontSize: 15
   },
   txtFontStyle: {
-    color: "rgb(179, 179, 179)",
+    color: "#b3b3b3",
     fontSize: 13
   },
   btnRequest: {
-    backgroundColor: "rgb(255, 255, 255)",
+    backgroundColor: "#ffffff",
     ...customStyle.center,
     height: 140
   },
   iconRequest: {
-    color: "rgb(45, 45, 45)",
+    color: "#2d2d2d",
     fontSize: 43
   },
   txtRequest: {
-    color: "rgb(45, 45, 45)",
+    color: "#2d2d2d",
     fontSize: 15
   }
 });

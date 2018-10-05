@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   grayLine: {
     height: 2,
-    backgroundColor: 'rgb(244, 244, 244)'
+    backgroundColor: '#f4f4f4'
   },
   txtAmount: {
     color: '#FF6E40'

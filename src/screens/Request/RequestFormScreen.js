@@ -213,7 +213,8 @@ class RequestFormScreen extends React.Component {
       fromDate,
       fromTime,
       toTime,
-      periodTime
+      periodTime,
+      selectedDayCount
     } = this.state;
 
     const dayArr = ["월", "화", "수", "목", "금", "토", "일"];
@@ -245,12 +246,12 @@ class RequestFormScreen extends React.Component {
     const { requestActions } = this.props;
     requestActions.setRequestTicketInfo(data);
 
+    if (selectedDayCount === 0) {
+      Alert.alert("", "희망 요일을 선택해주세요.");
+      return;
+    }
+
     Alert.alert("완료", "지원받기가 정상적으로 완료 되었습니다.", [
-      // {
-      //   text: "취소",
-      //   onPress: () => {},
-      //   style: "destructive"
-      // },
       {
         text: "확인",
         onPress: () => {
@@ -270,36 +271,47 @@ class RequestFormScreen extends React.Component {
     } = this.state;
 
     var { normalAmount, excellentAmount, proAmount } = 0;
+    var calculPickTicket = selectedDayCount * addTime;
+    var calculDayOfWekk = data * addTime;
+    var calculPeriodTime = selectedDayCount * data;
+    //정기권
+    var calculSeasonNormal = 4 * 11000;
+    var calculSeasonExcellent = 4 * 14500;
+    var calculSeasonPro = 4 * 17500;
+    //단발권
+    var calculSingleNormal = 13500;
+    var calculSingleExcellent = 17500;
+    var calculSinglePro = 21000;
 
     if (type === "season" || type === "single") {
       if (type === "season") {
-        normalAmount = 4 * 11000 * selectedDayCount * addTime;
-        excellentAmount = 4 * 14500 * selectedDayCount * addTime;
-        proAmount = 4 * 17500 * selectedDayCount * addTime;
+        normalAmount = calculSeasonNormal * calculPickTicket;
+        excellentAmount = calculSeasonExcellent * calculPickTicket;
+        proAmount = calculSeasonPro * calculPickTicket;
       } else {
-        normalAmount = 13500 * selectedDayCount * addTime;
-        excellentAmount = 17500 * selectedDayCount * addTime;
-        proAmount = 21000 * selectedDayCount * addTime;
+        normalAmount = calculSingleNormal * calculPickTicket;
+        excellentAmount = calculSingleExcellent * calculPickTicket;
+        proAmount = calculSinglePro * calculPickTicket;
       }
     } else if (type === "dayOfWeek") {
       if (pickTicket === "L") {
-        normalAmount = 4 * 11000 * data * addTime;
-        excellentAmount = 4 * 14500 * data * addTime;
-        proAmount = 4 * 17500 * data * addTime;
+        normalAmount = calculSeasonNormal * calculDayOfWekk;
+        excellentAmount = calculSeasonExcellent * calculDayOfWekk;
+        proAmount = calculSeasonPro * calculDayOfWekk;
       } else {
-        normalAmount = 13500 * data * addTime;
-        excellentAmount = 17500 * data * addTime;
-        proAmount = 21000 * data * addTime;
+        normalAmount = calculSingleNormal * calculDayOfWekk;
+        excellentAmount = calculSingleExcellent * calculDayOfWekk;
+        proAmount = calculSinglePro * calculDayOfWekk;
       }
     } else if (type === "periodTime") {
       if (pickTicket === "L") {
-        normalAmount = 4 * 11000 * selectedDayCount * data;
-        excellentAmount = 4 * 14500 * selectedDayCount * data;
-        proAmount = 4 * 17500 * selectedDayCount * data;
+        normalAmount = calculSeasonNormal * selectedDayCount * data;
+        excellentAmount = calculSeasonExcellent * selectedDayCount * data;
+        proAmount = calculSeasonPro * selectedDayCount * data;
       } else {
-        normalAmount = 11000 * selectedDayCount * data;
-        excellentAmount = 17500 * selectedDayCount * data;
-        proAmount = 21000 * selectedDayCount * data;
+        normalAmount = calculSingleNormal * selectedDayCount * data;
+        excellentAmount = calculSingleExcellent * selectedDayCount * data;
+        proAmount = calculSinglePro * selectedDayCount * data;
       }
     }
 
