@@ -8,10 +8,8 @@ import {
   Animated
 } from 'react-native'
 import { colors } from '../../lib/styleUtils'
-
-const numberWithCommas = num => {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
+import { numberWithCommas } from '../../lib/proposalUtils'
+import { handleEstimatedAmount } from '../../lib/proposalUtils'
 
 class EstimatedAmount extends React.Component {
   constructor (props) {
@@ -55,9 +53,15 @@ class EstimatedAmount extends React.Component {
   }
 
   render () {
-    const { normalAmount, excellentAmount, proAmount } = this.props.data
+    var { pickTicket, mDayOfWeek, hour } = this.props.data
     const { openMenu, hideMenu } = this
     const { menu_expanded } = this.state
+
+    var { normalAmount, excellentAmount, proAmount } = handleEstimatedAmount(
+      pickTicket,
+      mDayOfWeek,
+      hour
+    )
 
     const moveY = this.state.anim.yValue.interpolate({
       inputRange: [0, 1],
@@ -65,7 +69,9 @@ class EstimatedAmount extends React.Component {
     })
 
     return (
-      <View style={styles.container}>
+      <View
+        style={[styles.container, { bottom: pickTicket === 'L' ? -50 : -163 }]}
+      >
         <Animated.View
           style={[
             styles.viewBottom,
@@ -126,7 +132,8 @@ class EstimatedAmount extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    bottom: -50
+    // bottom: -50,
+    // bottom: -160
   },
   viewBottom: {
     backgroundColor: '#ffffff',

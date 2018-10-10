@@ -10,8 +10,13 @@ import { colors, customStyle } from '../../lib/styleUtils'
 
 class SelectPeriodTime extends React.Component {
   render () {
-    var { radio_props } = this.props
-    const { periodTime, onPress } = this.props
+    var radio_props = [
+      { label: '2시간', value: 2 },
+      { label: '3시간', value: 3 },
+      { label: '4시간', value: 4 }
+    ]
+
+    const { hour, onPress } = this.props
 
     return (
       <View style={styles.container}>
@@ -24,15 +29,13 @@ class SelectPeriodTime extends React.Component {
                     labelHorizontal
                     obj={obj}
                     index={i}
-                    isSelected={periodTime === obj.value}
+                    isSelected={hour === obj.value}
                     onPress={value => {
-                      onPress('periodTime', value)
+                      onPress('hour', value)
                     }}
                     borderWidth={1}
                     buttonInnerColor={'#FF6E40'}
-                    buttonOuterColor={
-                      periodTime === i ? colors.main : '#d1d1d1'
-                    }
+                    buttonOuterColor={hour === i + 2 ? colors.main : '#d1d1d1'}
                     buttonSize={10}
                     buttonOuterSize={20}
                     buttonWrapStyle={{ marginLeft: 10 }}
@@ -42,7 +45,7 @@ class SelectPeriodTime extends React.Component {
                     index={i}
                     labelHorizontal
                     onPress={value => {
-                      onPress('periodTime', value)
+                      onPress('hour', value)
                     }}
                     labelStyle={{ fontSize: 15 }}
                     labelWrapStyle={{}}

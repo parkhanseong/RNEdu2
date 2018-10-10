@@ -1,11 +1,22 @@
 import React from 'react'
 import { StyleSheet, View, Text } from 'react-native'
-import { colors } from '../../lib/styleUtils'
+import { colors, customStyle } from '../../lib/styleUtils'
 import DatePicker from 'react-native-datepicker'
+import { moment, getTimeText } from '../../lib/timeUtil'
 
 class SelectTime extends React.Component {
   render () {
-    const { initTime, fromTime, onPress } = this.props
+    const { startIndex, onPress } = this.props
+    const initTime = moment()
+      .hour(9)
+      .minute(0)
+      .format(TIME_FORMAT)
+    const maxDate = moment()
+      .hour(22)
+      .minute(0)
+      .format(TIME_FORMAT)
+
+    var startHour = getTimeText(startIndex)
 
     return (
       <View style={styles.container}>
@@ -13,12 +24,12 @@ class SelectTime extends React.Component {
           <Text>시작 시간</Text>
           <DatePicker
             style={{ width: 100, borderColor: '#FFFFFF' }}
-            date={fromTime}
+            date={startHour}
             mode='time'
             placeholder='select date'
-            format='A hh:mm'
+            format={TIME_FORMAT}
             minDate={initTime}
-            maxDate='24:00'
+            maxDate={maxDate}
             minuteInterval={30}
             confirmBtnText='확인'
             cancelBtnText='취소'
@@ -37,11 +48,10 @@ class SelectTime extends React.Component {
   }
 }
 
+const TIME_FORMAT = 'A hh:mm'
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    // backgroundColor: colors.background
-    backgroundColor: '#ffffff'
+    justifyContent: 'center'
   },
   viewFromTime: {
     backgroundColor: '#ffffff',

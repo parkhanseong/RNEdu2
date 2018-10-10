@@ -11,16 +11,20 @@ class RequestTicket extends React.Component {
 
     return (
       <View style={styles.container}>
-        <View style={styles.parentViewPlayTicket}>
+        <View
+          style={[
+            styles.parentViewPlayTicket,
+            { height: isSelected === 'L' ? 152 : 135 }
+          ]}
+        >
           <View style={styles.viewPlayTicket}>
             <Text style={styles.txtPlayTicket}>놀이 이용권</Text>
           </View>
           <View style={styles.grayLine} />
-
           <View style={styles.viewBtnOption}>
             <TouchableOpacity
               style={[styles.btnOption, { borderColor: pickColor_L }]}
-              onPress={onPress('season', 'L')}
+              onPress={onPress('pickTicket', 'L')}
             >
               <Text style={[styles.txtServiceTitle, { color: pickColor_L }]}>
                 정기권
@@ -29,10 +33,9 @@ class RequestTicket extends React.Component {
                 정기적으로 놀이 진행
               </Text>
             </TouchableOpacity>
-
             <TouchableOpacity
               style={[styles.btnOption, { borderColor: pickColor_S }]}
-              onPress={onPress('single', 'S')}
+              onPress={onPress('pickTicket', 'S')}
             >
               <Text style={[styles.txtServiceTitle, { color: pickColor_S }]}>
                 단발권
@@ -42,7 +45,6 @@ class RequestTicket extends React.Component {
               </Text>
             </TouchableOpacity>
           </View>
-
           {isSelected === 'L' ? (
             <View style={{ marginLeft: 22.5 }}>
               <Text style={{ color: '#FF6E40' }}>
@@ -61,13 +63,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background
   },
   parentViewPlayTicket: {
-    height: 152,
-    backgroundColor: 'rgb(255, 255, 255)'
+    backgroundColor: '#ffffff'
   },
   viewPlayTicket: {
     height: 45,
     justifyContent: 'center',
-    backgroundColor: 'rgb(255, 255, 255)'
+    backgroundColor: '#ffffff'
   },
   txtPlayTicket: {
     marginLeft: 22.5,
@@ -75,15 +76,15 @@ const styles = StyleSheet.create({
   },
   grayLine: {
     height: 2,
-    backgroundColor: 'rgb(244, 244, 244)'
+    backgroundColor: '#f4f4f4'
   },
   viewBtnOption: {
     flexDirection: 'row',
     ...customStyle.center,
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
+    marginTop: 10
   },
   btnOption: {
-    // flexDirection: "row",
     ...customStyle.center,
     width: 135,
     height: 49,

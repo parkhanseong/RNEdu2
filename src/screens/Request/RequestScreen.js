@@ -1,12 +1,13 @@
 import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
 import { colors, customStyle } from "../../lib/styleUtils";
-import { moment } from "../../lib/timeUtil";
+import { moment, getTimeString } from "../../lib/timeUtil";
 import { HeaderButton } from "../../components/Base";
 import * as requestActions from "../../redux/modules/request";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { List, Map } from "immutable";
+import _ from "underscore";
 
 class RequestScreen extends React.Component {
   constructor(props) {
@@ -16,9 +17,6 @@ class RequestScreen extends React.Component {
       pickTicket: "",
       mDayOfWeek: "",
       fromDate: "",
-      fromTime: "",
-      toTime: "",
-      periodTime: "",
       daysArr: ""
     };
   }
@@ -41,7 +39,7 @@ class RequestScreen extends React.Component {
 
   shouldComponentUpdate = (nextProps, nextState) => {
     var { reqeustTicketInfo } = this.props;
-    if (reqeustTicketInfo !== nextProps.reqeustTicketInfo) {
+    if (!_.isEqual(reqeustTicketInfo, nextProps.reqeustTicketInfo)) {
       return true;
     }
     return false;
@@ -83,9 +81,11 @@ class RequestScreen extends React.Component {
     reqeustTicketInfo =
       reqeustTicketInfo === undefined ? undefined : reqeustTicketInfo.toJS();
 
-    const { pickTicket, fromTime, toTime, fromDate, mDayOfWeek, daysArr } =
+    const { pickTicket, fromDate, mDayOfWeek, daysArr, startIndex, hour } =
       reqeustTicketInfo === undefined ? "" : reqeustTicketInfo;
     const { _onPress, removeRequestData } = this;
+    const strPeriodTime = getTimeString(startIndex, hour);
+    const strFromDate = moment(fromDate).format(FROMDATE_FORMAT);
 
     return (
       <View style={styles.container}>
@@ -97,9 +97,15 @@ class RequestScreen extends React.Component {
                 신청서는 하나의 놀이만 등록 가능합니다.
               </Text>
             </View>
-            <TouchableOpacity style={styles.btnRequest} onPress={_onPress}>
-              <Text style={styles.iconRequest}>+</Text>
-              <Text style={styles.txtRequest}>신청서 등록하기</Text>
+
+            <TouchableOpacity
+              onPress={_onPress}
+              style={styles.parentBtnRequest}
+            >
+              <View style={styles.btnRequest}>
+                <Text style={styles.iconRequest}>+</Text>
+                <Text style={styles.txtRequest}>신청서 등록하기</Text>
+              </View>
             </TouchableOpacity>
           </View>
         ) : (
@@ -110,6 +116,7 @@ class RequestScreen extends React.Component {
                 신청서는 자동 삭제됩니다.
               </Text>
             </View>
+
             <View style={styles.txtTitle}>
               <Text>신청서 정보</Text>
             </View>
@@ -117,31 +124,20 @@ class RequestScreen extends React.Component {
               <Text>놀이 이용권</Text>
               <Text>{pickTicket === "L" ? "정기권" : "단발성"}</Text>
             </View>
-            <View style={styles.txtReqInfo}>
-              <Text>희망 요일</Text>
-              <Text>{mDayOfWeek === null ? "" : daysArr}</Text>
-            </View>
+            {pickTicket === "L" ? (
+              <View style={styles.txtReqInfo}>
+                <Text>희망 요일</Text>
+                <Text>{mDayOfWeek === null ? "" : daysArr}</Text>
+              </View>
+            ) : null}
             <View style={styles.txtReqInfo}>
               <Text>시작 날짜</Text>
-              <Text>
-                {moment(fromDate).format(FROMDATE_FORMAT) === null
-                  ? ""
-                  : moment(fromDate).format(FROMDATE_FORMAT)}
-              </Text>
+              <Text>{strFromDate === null ? "" : strFromDate}</Text>
             </View>
             <View style={styles.txtReqInfo}>
               <Text>시작 시간</Text>
-              <Text>
-                {moment(fromTime).format(FROMTIME_FORMAT) === null
-                  ? ""
-                  : moment(fromTime).format(FROMTIME_FORMAT)}{" "}
-                ~{" "}
-                {moment(toTime).format(FROMTIME_FORMAT) === null
-                  ? ""
-                  : moment(toTime).format(FROMTIME_FORMAT)}
-              </Text>
+              <Text>{strPeriodTime === null ? "" : strPeriodTime}</Text>
             </View>
-
             <TouchableOpacity
               style={styles.btnDelete}
               onPress={removeRequestData()}
@@ -166,11 +162,11 @@ const styles = StyleSheet.create({
   },
   txtNotice: {
     backgroundColor: "#f4f4f4",
-    ...customStyle.center,
+    justifyContent: "center",
+    marginLeft: 20,
     height: 70
   },
   txtTitle: {
-    marginTop: 10,
     backgroundColor: "#ffffff",
     justifyContent: "center",
     height: 50,
@@ -200,10 +196,14 @@ const styles = StyleSheet.create({
     color: "#b3b3b3",
     fontSize: 13
   },
+  parentBtnRequest: {
+    ...customStyle.center,
+    backgroundColor: "#ffffff",
+    height: 140
+  },
   btnRequest: {
     backgroundColor: "#ffffff",
-    ...customStyle.center,
-    height: 140
+    ...customStyle.center
   },
   iconRequest: {
     color: "#2d2d2d",

@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   selectedDayOfWeek: {
     width: 34,
     height: 34,
-    backgroundColor: 'rgb(231, 231, 231)',
+    backgroundColor: '#e7e7e7',
     borderRadius: 50,
     ...customStyle.center
   }

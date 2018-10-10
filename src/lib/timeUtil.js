@@ -56,3 +56,36 @@ moment.defineLocale('ko', {
     return input.includes('오후')
   }
 })
+
+export const convertToIndex = (date, format) => {
+  const hourIndex = (moment(date, format).hour() - 9) * 2
+  const minIndex = moment(date, format).minute() === 0 ? 0 : 1
+  return hourIndex + minIndex
+}
+
+export const getTimeString = (
+  index,
+  hour,
+  format = 'A h:mm',
+  isHour = false
+) => {
+  const startHour = index / 2 + 9
+  const min = index % 2 == 0 ? 0 : 30
+  const startTime = moment()
+    .hour(startHour)
+    .minutes(min)
+  const endTime = moment(startTime).add(hour, 'h')
+  const strStartTime = startTime.format(format)
+  const strEndTime = endTime.format(format)
+  const strHour = isHour ? ` (${hour}시간)` : ''
+  return `${strStartTime} ~ ${strEndTime}${strHour}`
+}
+
+export const getTimeText = (index, format = 'A hh:mm') => {
+  const hour = index / 2 + 9
+  const min = index % 2 == 0 ? 0 : 30
+  return moment()
+    .hour(hour)
+    .minute(min)
+    .format(format)
+}

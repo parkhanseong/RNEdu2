@@ -2,15 +2,22 @@ import React from 'react'
 import { StyleSheet, View, Text } from 'react-native'
 import { colors } from '../../lib/styleUtils'
 import DatePicker from 'react-native-datepicker'
-
+import { moment } from '../../lib/timeUtil'
 class SelectDay extends React.Component {
   render () {
-    const { onPress, fromDate, initDate } = this.props
+    const {
+      onPress,
+      data: { fromDate, pickTicket }
+    } = this.props
+
+    const initDate = moment()
+      .add('2', 'd')
+      .format('YYYY[년] MM[월] DD[일] (ddd)')
 
     return (
       <View style={styles.container}>
         <View style={styles.viewFormDate}>
-          <Text>시작 날짜</Text>
+          {pickTicket === 'L' ? <Text>시작 날짜</Text> : <Text>희망 날짜</Text>}
           <DatePicker
             style={{ width: 140 }}
             date={fromDate}
@@ -37,6 +44,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff'
   },
   viewFormDate: {
+    height: 50,
     backgroundColor: '#ffffff',
     flexDirection: 'row',
     justifyContent: 'space-between',

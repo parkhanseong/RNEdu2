@@ -19,39 +19,25 @@ import {
   SelectPeriodTime,
   EstimatedAmount
 } from "../../components/Request";
-import { moment } from "../../lib/timeUtil";
+import { moment, convertToIndex, getTimeString } from "../../lib/timeUtil";
 import * as requestActions from "../../redux/modules/request";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import {
+  convertDayToCount,
+  converDayToStringDay,
+  handleEstimatedAmount
+} from "../../lib/proposalUtils";
 
 class RequestFormScreen extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       pickTicket: "L",
-      mDayOfWeek: "0000000",
-      radioValue: "",
-      initDate: moment().format("YYYY[년] MM[월] DD[일] (ddd)"),
-      fromDate: moment(),
-      initTime: moment()
-        .hour(9)
-        .minute(0)
-        .format(TIME_FORMAT),
-      fromTime: moment()
-        .hour(9)
-        .minute(0),
-      periodTime: 0,
-      toTime: moment()
-        .hour(11)
-        .minute(0),
-      addTime: 2,
-      selectedDayCount: 0,
-      estimatedAmount: {
-        normalAmount: 0,
-        excellentAmount: 0,
-        proAmount: 0
-      }
+      mDayOfWeek: 0,
+      fromDate: moment().add(2, "d"),
+      startIndex: 0,
+      hour: 2
     };
   }
 
@@ -68,15 +54,14 @@ class RequestFormScreen extends React.Component {
         mDayOfWeek: reqeustTicketInfo.mDayOfWeek,
         daysArr: reqeustTicketInfo.daysArr,
         fromDate: reqeustTicketInfo.fromDate,
-        fromTime: reqeustTicketInfo.fromTime,
-        toTime: reqeustTicketInfo.toTime,
-        periodTime: reqeustTicketInfo.periodTime
+        startIndex: reqeustTicketInfo.startIndex,
+        hour: reqeustTicketInfo.hour
       });
     }
   }
 
   handleDayOfWeek = (type, day) => () => {
-    var { mDayOfWeek } = this.state;
+    var { mDayOfWeek, pickTicket, hour } = this.state;
     var isSelected = 1;
     if (((mDayOfWeek >> day) & 1) === 1) {
       isSelected = 0;
@@ -84,88 +69,37 @@ class RequestFormScreen extends React.Component {
 
     var _mDayOfWeek =
       isSelected === 1 ? (mDayOfWeek |= 1 << day) : (mDayOfWeek &= ~(1 << day));
-    var countDayOfWeek = mDayOfWeek.toString(2).match(/1/g || []);
-    var count = countDayOfWeek !== null ? countDayOfWeek.length : 0;
+    var count = convertDayToCount(mDayOfWeek);
 
     if (count > 3) {
       Alert.alert("", "요일은 최대 3일까지만 가능합니다.");
       return false;
     }
 
-    var {
-      normalAmount,
-      excellentAmount,
-      proAmount
-    } = this.handleEstimatedAmount(type, count);
-
     this.setState({
       ...this.state,
-      mDayOfWeek: _mDayOfWeek,
-      selectedDayCount: count,
-      estimatedAmount: {
-        normalAmount,
-        excellentAmount,
-        proAmount
-      }
+      mDayOfWeek: _mDayOfWeek
     });
   };
 
-  _onPressPickTicket = (type, data) => () => {
-    const value = type === "season" ? "L" : "S";
-    var {
-      normalAmount,
-      excellentAmount,
-      proAmount
-    } = this.handleEstimatedAmount(type, data);
-
+  _onPressPickTicket = (type, value) => () => {
     this.setState({
-      pickTicket: value,
-      estimatedAmount: {
-        normalAmount,
-        excellentAmount,
-        proAmount
-      }
+      ...this.state,
+      [type]: value
     });
   };
 
-  onPeriodTimeChange = (type, date) => {
-    const { fromTime } = this.state;
-    var { addTime } = this.state;
-
-    switch (date) {
-      case 0:
-        addTime = 2;
-        break;
-      case 1:
-        addTime = 3;
-        break;
-      case 2:
-        addTime = 4;
-        break;
-      default:
-        break;
-    }
-
-    var {
-      normalAmount,
-      excellentAmount,
-      proAmount
-    } = this.handleEstimatedAmount(type, addTime);
-
+  onPeriodTimeChange = (type, hour) => {
     this.setState({
-      toTime: moment(fromTime, TIME_FORMAT).add(addTime, "h"),
-      addTime: addTime,
-      [type]: date,
-      estimatedAmount: {
-        normalAmount,
-        excellentAmount,
-        proAmount
-      }
+      ...this.state,
+      hour: hour
     });
   };
 
   onDateChange = type => date => {
-    const { addTime } = this.state;
+    var startIndex = convertToIndex(date, "A hh:mm");
+    const { hour } = this.state;
+
     var FORMAT = "";
     switch (type) {
       case "fromDate":
@@ -178,75 +112,39 @@ class RequestFormScreen extends React.Component {
         break;
     }
 
-    /*
-     * 화면 죽어버리는 오류로 인해 임시 주석
-    */
-    // var inputDate = moment(date, FORMAT).hour();
-    // var nowDate = moment().hour();
-    // console.log(inputDate);
-    // console.log(nowDate);
-    // console.log(inputDate.diff(nowDate, "days"));
-    // if (
-    //   inputDate.diff(nowDate, "days", true) < 2
-    // ) {
-    //   Alert.alert("", "놀이 이용은 오늘로부터 2일 후부터 가능합니다.");
-    //   return false;
-    // }
-
-    // if (type === "fromTime") {
-    //   if (inputDate < 9 || inputDate > 22) {
-    //     Alert.alert("신청 가능 시간은 09시 ~ 22시 까지입니다.");
-    //     return;
-    //   }
-    // }
-
-    this.setState({
-      toTime: moment(date, TIME_FORMAT).add(addTime, "h"),
-      [type]: moment(date, FORMAT)
-    });
+    if (type === "fromDate") {
+      this.setState({
+        ...this.state,
+        [type]: moment(date, FORMAT)
+      });
+    } else {
+      this.setState({
+        ...this.state,
+        startIndex: startIndex,
+        hour: hour
+      });
+    }
   };
 
   _onPressRequestService = () => {
-    const {
-      pickTicket,
-      mDayOfWeek,
-      fromDate,
-      fromTime,
-      toTime,
-      periodTime,
-      selectedDayCount
-    } = this.state;
+    const { pickTicket, mDayOfWeek, fromDate, startIndex, hour } = this.state;
 
-    const dayArr = ["월", "화", "수", "목", "금", "토", "일"];
-    var strArray = [];
-    var daysArr = [];
-    var strDayOfWeek = mDayOfWeek.toString(2).toString();
-
-    //2진수 배열에 담기
-    for (var i = strDayOfWeek.length; i > 0; i--) {
-      strArray.push(strDayOfWeek.substring(i, i - 1));
-    }
-    //2진수 요일로 변환
-    for (var i = 0; i < strArray.length; i++) {
-      if (strArray[i] === "1") {
-        daysArr.push(dayArr[i]);
-      }
-    }
-
+    //Number 요일 > String 요일로 변환
+    var daysArr = converDayToStringDay(mDayOfWeek);
+    var dayCount = convertDayToCount(mDayOfWeek);
     const data = {
       pickTicket: pickTicket,
       mDayOfWeek: mDayOfWeek,
-      daysArr: daysArr.join(", "),
+      daysArr: daysArr,
       fromDate: fromDate,
-      fromTime: fromTime,
-      toTime: toTime,
-      periodTime: periodTime
+      startIndex: startIndex,
+      hour: hour
     };
 
     const { requestActions } = this.props;
     requestActions.setRequestTicketInfo(data);
 
-    if (selectedDayCount === 0) {
+    if (dayCount === 0 && pickTicket === "L") {
       Alert.alert("", "희망 요일을 선택해주세요.");
       return;
     }
@@ -261,135 +159,62 @@ class RequestFormScreen extends React.Component {
     ]);
   };
 
-  handleEstimatedAmount = (type, data) => {
-    const {
-      pickTicket,
-      periodTime,
-      mDayOfWeek,
-      selectedDayCount,
-      addTime
-    } = this.state;
-
-    var { normalAmount, excellentAmount, proAmount } = 0;
-    var calculPickTicket = selectedDayCount * addTime;
-    var calculDayOfWekk = data * addTime;
-    var calculPeriodTime = selectedDayCount * data;
-    //정기권
-    var calculSeasonNormal = 4 * 11000;
-    var calculSeasonExcellent = 4 * 14500;
-    var calculSeasonPro = 4 * 17500;
-    //단발권
-    var calculSingleNormal = 13500;
-    var calculSingleExcellent = 17500;
-    var calculSinglePro = 21000;
-
-    if (type === "season" || type === "single") {
-      if (type === "season") {
-        normalAmount = calculSeasonNormal * calculPickTicket;
-        excellentAmount = calculSeasonExcellent * calculPickTicket;
-        proAmount = calculSeasonPro * calculPickTicket;
-      } else {
-        normalAmount = calculSingleNormal * calculPickTicket;
-        excellentAmount = calculSingleExcellent * calculPickTicket;
-        proAmount = calculSinglePro * calculPickTicket;
-      }
-    } else if (type === "dayOfWeek") {
-      if (pickTicket === "L") {
-        normalAmount = calculSeasonNormal * calculDayOfWekk;
-        excellentAmount = calculSeasonExcellent * calculDayOfWekk;
-        proAmount = calculSeasonPro * calculDayOfWekk;
-      } else {
-        normalAmount = calculSingleNormal * calculDayOfWekk;
-        excellentAmount = calculSingleExcellent * calculDayOfWekk;
-        proAmount = calculSinglePro * calculDayOfWekk;
-      }
-    } else if (type === "periodTime") {
-      if (pickTicket === "L") {
-        normalAmount = calculSeasonNormal * selectedDayCount * data;
-        excellentAmount = calculSeasonExcellent * selectedDayCount * data;
-        proAmount = calculSeasonPro * selectedDayCount * data;
-      } else {
-        normalAmount = calculSingleNormal * selectedDayCount * data;
-        excellentAmount = calculSingleExcellent * selectedDayCount * data;
-        proAmount = calculSinglePro * selectedDayCount * data;
-      }
-    }
-
-    return { normalAmount, excellentAmount, proAmount };
-  };
-
   render() {
-    var radio_props = [
-      { label: "2시간", value: 0 },
-      { label: "3시간", value: 1 },
-      { label: "4시간", value: 2 }
-    ];
-
     const {
       _onPress,
       _onPressPickTicket,
       onDateChange,
+      onPressInfoChange,
       onPeriodTimeChange,
       handleDayOfWeek,
       _onPressRequestService
     } = this;
-    const {
-      pickTicket,
-      selectedPeriod,
-      selectedService,
-      initDate,
-      initTime,
-      periodTime,
-      fromDate,
-      fromTime,
-      toTime,
-      mDayOfWeek,
-      estimatedAmount
-    } = this.state;
+    const { startIndex, hour, pickTicket, fromDate, mDayOfWeek } = this.state;
 
     return (
       <View style={styles.container}>
         {/* 이용권 선택 */}
         <RequestTicket isSelected={pickTicket} onPress={_onPressPickTicket} />
-        <View style={styles.viewTimeRequest}>
-          <View style={styles.viewPlayTicket}>
-            <Text style={styles.txtPlayTicket}>희망 요일</Text>
+
+        {pickTicket === "L" ? (
+          <View style={[styles.viewTimeRequest, { height: 256 }]}>
+            <View style={styles.viewPlayTicket}>
+              <Text style={styles.txtPlayTicket}>희망 요일</Text>
+            </View>
+            <View style={styles.grayLine} />
+            <View style={[styles.viewSelectDayTime, { height: 100 }]}>
+              {/* 요일 선택 */}
+              <DayOfWeek onPress={handleDayOfWeek} isSelected={mDayOfWeek} />
+              {/* 시작 날짜 선택 */}
+              <SelectDay
+                data={{ fromDate, pickTicket }}
+                onPress={onDateChange}
+              />
+            </View>
+            <View style={styles.grayLine} />
+            {/* 시작 시간 선택 */}
+            <SelectTime onPress={onDateChange} startIndex={startIndex} />
+            <View style={styles.grayLine} />
+            {/* 이용 시간 선택 */}
+            <SelectPeriodTime hour={hour} onPress={onPeriodTimeChange} />
           </View>
-          <View style={styles.grayLine} />
-          <View style={styles.viewSelectDayTime}>
-            {/* 요일 선택 */}
-            <DayOfWeek onPress={handleDayOfWeek} isSelected={mDayOfWeek} />
-            {/* 시작 날짜 선택 */}
-            <SelectDay
-              fromDate={fromDate}
-              init={initDate}
-              onPress={onDateChange}
-            />
+        ) : (
+          <View style={[styles.viewTimeRequest, { height: 160 }]}>
+            <SelectDay data={{ fromDate, pickTicket }} onPress={onDateChange} />
+            {/* 시작 시간 선택 */}
+            <View style={styles.grayLine} />
+            <SelectTime onPress={onDateChange} startIndex={startIndex} />
+            <View style={styles.grayLine} />
+            {/* 이용 시간 선택 */}
+            <SelectPeriodTime hour={hour} onPress={onPeriodTimeChange} />
           </View>
-          <View style={styles.grayLine} />
-          {/* 시작 시간 선택 */}
-          <SelectTime
-            onPress={onDateChange}
-            fromTime={fromTime}
-            initTime={initTime}
-          />
-          <View style={styles.grayLine} />
-          {/* 이용 시간 선택 */}
-          <SelectPeriodTime
-            radio_props={radio_props}
-            periodTime={periodTime}
-            onPress={onPeriodTimeChange}
-          />
-        </View>
+        )}
 
         <View style={styles.txtResultPeriod}>
-          <Text>
-            {fromTime.format(TIME_FORMAT)} ~ {toTime.format(TIME_FORMAT)}
-          </Text>
-          <Text />
+          <Text>{getTimeString(startIndex, hour)}</Text>
         </View>
 
-        <EstimatedAmount data={estimatedAmount} />
+        <EstimatedAmount data={{ pickTicket, hour, mDayOfWeek }} />
         <ButtonNext onPress={_onPressRequestService} disabled={true}>
           지원받기
         </ButtonNext>
@@ -402,11 +227,11 @@ const TIME_FORMAT = "A hh:mm";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "rgb(244, 244, 244)"
+    backgroundColor: colors.background
   },
   grayLine: {
     height: 2,
-    backgroundColor: "rgb(244, 244, 244)"
+    backgroundColor: colors.background
   },
   txtServiceSubTitle: {
     fontSize: 11
@@ -414,20 +239,17 @@ const styles = StyleSheet.create({
   viewPlayTicket: {
     height: 45,
     justifyContent: "center",
-    backgroundColor: "rgb(255, 255, 255)"
+    backgroundColor: "#ffffff"
   },
   txtPlayTicket: {
     marginLeft: 22.5,
     fontSize: 15
   },
   viewTimeRequest: {
-    height: 256,
-    backgroundColor: "rgb(255, 255, 255)",
+    backgroundColor: "#ffffff",
     marginTop: 10
   },
-  viewSelectDayTime: {
-    height: 100
-  },
+  viewSelectDayTime: {},
   txtResultPeriod: {
     ...customStyle.center,
     height: 40
@@ -437,14 +259,10 @@ const styles = StyleSheet.create({
   }
 });
 
-// export default RequestFormScreen;
 export default connect(
-  state => (
-    console.log(state.request.get("reqeustTicketInfo")),
-    {
-      reqeustTicketInfo: state.request.get("reqeustTicketInfo")
-    }
-  ),
+  state => ({
+    reqeustTicketInfo: state.request.get("reqeustTicketInfo")
+  }),
   dispatch => ({
     requestActions: bindActionCreators(requestActions, dispatch)
   })
