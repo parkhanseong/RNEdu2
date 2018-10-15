@@ -5,11 +5,25 @@ import {
   Text,
   Image,
   TouchableOpacity,
-  Animated
+  Animated,
+  Platform
 } from 'react-native'
-import { colors } from '../../lib/styleUtils'
+import { colors, isSE, isX } from '../../lib/styleUtils'
 import { numberWithCommas } from '../../lib/proposalUtils'
 import { handleEstimatedAmount } from '../../lib/proposalUtils'
+
+const PRICE_CELL = 45
+const TICKET_NAME_ARRAY = ['일반 시터', '우수 시터', '전문 시터']
+const PriceView = ({ index, priceArr }) => {
+  return (
+    <View style={styles.viewEstimatedAmount}>
+      <Text>{TICKET_NAME_ARRAY[index]}</Text>
+      <Text style={styles.txtAmount}>
+        {numberWithCommas(priceArr[index])} 원
+      </Text>
+    </View>
+  )
+}
 
 class EstimatedAmount extends React.Component {
   constructor (props) {
@@ -22,7 +36,7 @@ class EstimatedAmount extends React.Component {
     }
   }
 
-  openMenu () {
+  handleOpenMenu () {
     this.setState(
       {
         menu_expanded: true
@@ -37,7 +51,7 @@ class EstimatedAmount extends React.Component {
     )
   }
 
-  hideMenu () {
+  handleHideMenu () {
     this.setState(
       {
         menu_expanded: false
@@ -54,121 +68,98 @@ class EstimatedAmount extends React.Component {
 
   render () {
     var { pickTicket, mDayOfWeek, hour } = this.props.data
-    const { openMenu, hideMenu } = this
+    const { handleOpenMenu, handleHideMenu } = this
     const { menu_expanded } = this.state
 
-    var { normalAmount, excellentAmount, proAmount } = handleEstimatedAmount(
-      pickTicket,
-      mDayOfWeek,
-      hour
-    )
+    var priceArr = handleEstimatedAmount(pickTicket, mDayOfWeek, hour)
 
     const moveY = this.state.anim.yValue.interpolate({
       inputRange: [0, 1],
-      outputRange: [0, -150]
+      outputRange: [0, PRICE_CELL * -3]
+    })
+
+    const priceList = TICKET_NAME_ARRAY.map((item, index) => {
+      return <PriceView index={index} priceArr={priceArr} key={index} />
     })
 
     return (
-      <View
-        style={[styles.container, { bottom: pickTicket === 'L' ? -50 : -163 }]}
+      <Animated.View
+        style={[
+          styles.viewBottom,
+          {
+            transform: [
+              {
+                translateY: moveY
+              }
+            ]
+          }
+        ]}
       >
-        <Animated.View
-          style={[
-            styles.viewBottom,
-            {
-              transform: [
-                {
-                  translateY: moveY
-                }
-              ]
+        <View style={[styles.childrenAnim]}>
+          <TouchableOpacity
+            onPress={
+              menu_expanded === false
+                ? handleOpenMenu.bind(this)
+                : handleHideMenu.bind(this)
             }
-          ]}
-        >
-          {menu_expanded === false ? (
-            <TouchableOpacity
-              onPress={openMenu.bind(this)}
-              style={styles.viewEstimatedAmount_top}
-            >
-              <View style={styles.btnTopOfAmount}>
-                <Text>예상 금액</Text>
-                <Image source={require('../../images/down.png')} />
-              </View>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={hideMenu.bind(this)}
-              style={styles.viewEstimatedAmount_top}
-            >
-              <View style={styles.btnTopOfAmount}>
-                <Text>예상 금액</Text>
-                <Image source={require('../../images/downCopy.png')} />
-              </View>
-            </TouchableOpacity>
-          )}
-          <View style={styles.grayLine} />
-          <View style={styles.viewEstimatedAmount}>
-            <Text>일반 시터</Text>
-            <Text style={styles.txtAmount}>
-              {numberWithCommas(normalAmount)} 원
-            </Text>
-          </View>
-          <View style={styles.viewEstimatedAmount}>
-            <Text>우수 시터</Text>
-            <Text style={styles.txtAmount}>
-              {numberWithCommas(excellentAmount)} 원
-            </Text>
-          </View>
-          <View style={styles.viewEstimatedAmount}>
-            <Text>전문 시터</Text>
-            <Text style={styles.txtAmount}>
-              {numberWithCommas(proAmount)} 원
-            </Text>
-          </View>
-        </Animated.View>
-      </View>
+            style={styles.viewEstimatedAmount_top}
+          >
+            <Text>예상 금액</Text>
+            {menu_expanded === false ? (
+              <Image source={require('../../images/down.png')} />
+            ) : (
+              <Image source={require('../../images/downCopy.png')} />
+            )}
+          </TouchableOpacity>
+          {priceList}
+        </View>
+      </Animated.View>
     )
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    // bottom: -50,
-    // bottom: -160
-  },
   viewBottom: {
-    backgroundColor: '#ffffff',
+    flex: 1,
+    bottom: isX ? PRICE_CELL * -3.8 : PRICE_CELL * -2
+  },
+  childrenAnim: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: isX ? PRICE_CELL * 2 : 0,
+    borderBottomColor: 'white',
+    borderWidth: 1,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    borderColor: '#FF6E40',
-    borderWidth: 1
-  },
-  btnTopOfAmount: {
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: 50,
-    marginHorizontal: 22.5
+    borderColor: '#FF6E40'
   },
   viewEstimatedAmount_top: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    height: PRICE_CELL,
+    backgroundColor: 'white',
+    paddingHorizontal: 22.5,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    backgroundColor: '#ffffff'
+    borderBottomWidth: 1,
+    borderBottomColor: colors.grayBorder
   },
   viewEstimatedAmount: {
-    backgroundColor: '#ffffff',
+    backgroundColor: 'white',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 50,
-    marginHorizontal: 22.5
-  },
-  grayLine: {
-    height: 2,
-    backgroundColor: '#f4f4f4'
+    height: PRICE_CELL,
+    paddingHorizontal: 22.5
   },
   txtAmount: {
     color: '#FF6E40'
+  },
+  grayLine: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.grayBorder
   }
 })
 

@@ -81,6 +81,16 @@ export const getTimeString = (
   return `${strStartTime} ~ ${strEndTime}${strHour}`
 }
 
+export const getEndTime = (index, hour) => {
+  const startHour = index / 2 + 9
+  const min = index % 2 == 0 ? 0 : 30
+  const startTime = moment()
+    .hour(startHour)
+    .minutes(min)
+  const endTime = moment(startTime).add(hour, 'h')
+  return endTime.hour()
+}
+
 export const getTimeText = (index, format = 'A hh:mm') => {
   const hour = index / 2 + 9
   const min = index % 2 == 0 ? 0 : 30

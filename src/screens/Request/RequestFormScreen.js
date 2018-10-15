@@ -7,9 +7,10 @@ import {
   Switch,
   Button,
   Alert,
-  ScrollView
+  ScrollView,
+  FlatList
 } from "react-native";
-import { colors, customStyle } from "../../lib/styleUtils";
+import { colors, customStyle, isSE } from "../../lib/styleUtils";
 import { ButtonNext } from "../../components/Auth";
 import {
   RequestTicket,
@@ -19,10 +20,16 @@ import {
   SelectPeriodTime,
   EstimatedAmount
 } from "../../components/Request";
-import { moment, convertToIndex, getTimeString } from "../../lib/timeUtil";
+import {
+  moment,
+  convertToIndex,
+  getTimeString,
+  getEndTime
+} from "../../lib/timeUtil";
 import * as requestActions from "../../redux/modules/request";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import PropTypes from "prop-types";
 import {
   convertDayToCount,
   converDayToStringDay,
@@ -44,19 +51,12 @@ class RequestFormScreen extends React.Component {
   componentDidMount() {
     var { reqeustTicketInfo } = this.props;
 
-    reqeustTicketInfo =
-      reqeustTicketInfo === undefined ? undefined : reqeustTicketInfo.toJS();
+    reqeustTicketInfo = !reqeustTicketInfo
+      ? undefined
+      : reqeustTicketInfo.toJS();
 
-    if (reqeustTicketInfo != undefined) {
-      this.setState({
-        ...this.state,
-        pickTicket: reqeustTicketInfo.pickTicket,
-        mDayOfWeek: reqeustTicketInfo.mDayOfWeek,
-        daysArr: reqeustTicketInfo.daysArr,
-        fromDate: reqeustTicketInfo.fromDate,
-        startIndex: reqeustTicketInfo.startIndex,
-        hour: reqeustTicketInfo.hour
-      });
+    if (reqeustTicketInfo) {
+      this.setState(reqeustTicketInfo);
     }
   }
 
@@ -82,14 +82,14 @@ class RequestFormScreen extends React.Component {
     });
   };
 
-  _onPressPickTicket = (type, value) => () => {
+  handlePickTicket = (type, value) => () => {
     this.setState({
       ...this.state,
       [type]: value
     });
   };
 
-  onPeriodTimeChange = (type, hour) => {
+  handlePeriodTimeChange = (type, hour) => {
     this.setState({
       ...this.state,
       hour: hour
@@ -126,10 +126,9 @@ class RequestFormScreen extends React.Component {
     }
   };
 
-  _onPressRequestService = () => {
+  onPressRequestService = () => {
     const { pickTicket, mDayOfWeek, fromDate, startIndex, hour } = this.state;
 
-    //Number 요일 > String 요일로 변환
     var daysArr = converDayToStringDay(mDayOfWeek);
     var dayCount = convertDayToCount(mDayOfWeek);
     const data = {
@@ -149,11 +148,16 @@ class RequestFormScreen extends React.Component {
       return;
     }
 
+    if (getEndTime(startIndex, hour) > 22) {
+      Alert.alert("", "종료 시간은 22시를 넘길 수 없습니다.");
+      return;
+    }
+
     Alert.alert("완료", "지원받기가 정상적으로 완료 되었습니다.", [
       {
         text: "확인",
         onPress: () => {
-          this.props.navigation.navigate("Request", { data: data });
+          this.props.navigation.navigate("Request", { data });
         }
       }
     ]);
@@ -161,61 +165,38 @@ class RequestFormScreen extends React.Component {
 
   render() {
     const {
-      _onPress,
-      _onPressPickTicket,
+      handlePickTicket,
       onDateChange,
       onPressInfoChange,
-      onPeriodTimeChange,
+      handlePeriodTimeChange,
       handleDayOfWeek,
-      _onPressRequestService
+      onPressRequestService
     } = this;
     const { startIndex, hour, pickTicket, fromDate, mDayOfWeek } = this.state;
 
-    return (
-      <View style={styles.container}>
-        {/* 이용권 선택 */}
-        <RequestTicket isSelected={pickTicket} onPress={_onPressPickTicket} />
-
-        {pickTicket === "L" ? (
-          <View style={[styles.viewTimeRequest, { height: 256 }]}>
-            <View style={styles.viewPlayTicket}>
-              <Text style={styles.txtPlayTicket}>희망 요일</Text>
-            </View>
-            <View style={styles.grayLine} />
-            <View style={[styles.viewSelectDayTime, { height: 100 }]}>
-              {/* 요일 선택 */}
-              <DayOfWeek onPress={handleDayOfWeek} isSelected={mDayOfWeek} />
-              {/* 시작 날짜 선택 */}
-              <SelectDay
-                data={{ fromDate, pickTicket }}
-                onPress={onDateChange}
-              />
-            </View>
-            <View style={styles.grayLine} />
-            {/* 시작 시간 선택 */}
-            <SelectTime onPress={onDateChange} startIndex={startIndex} />
-            <View style={styles.grayLine} />
-            {/* 이용 시간 선택 */}
-            <SelectPeriodTime hour={hour} onPress={onPeriodTimeChange} />
-          </View>
-        ) : (
-          <View style={[styles.viewTimeRequest, { height: 160 }]}>
-            <SelectDay data={{ fromDate, pickTicket }} onPress={onDateChange} />
-            {/* 시작 시간 선택 */}
-            <View style={styles.grayLine} />
-            <SelectTime onPress={onDateChange} startIndex={startIndex} />
-            <View style={styles.grayLine} />
-            {/* 이용 시간 선택 */}
-            <SelectPeriodTime hour={hour} onPress={onPeriodTimeChange} />
-          </View>
-        )}
+    const renderView = (
+      <View>
+        <RequestTicket isSelected={pickTicket} onPress={handlePickTicket} />
+        <View style={[styles.viewTimeRequest]}>
+          {pickTicket === "L" ? (
+            <DayOfWeek onPress={handleDayOfWeek} isSelected={mDayOfWeek} />
+          ) : null}
+          <SelectDay data={{ fromDate, pickTicket }} onPress={onDateChange} />
+          <SelectTime onPress={onDateChange} startIndex={startIndex} />
+          <SelectPeriodTime hour={hour} onPress={handlePeriodTimeChange} />
+        </View>
 
         <View style={styles.txtResultPeriod}>
           <Text>{getTimeString(startIndex, hour)}</Text>
         </View>
+      </View>
+    );
 
+    return (
+      <View style={styles.container}>
+        {isSE ? <ScrollView>{renderView}</ScrollView> : renderView}
         <EstimatedAmount data={{ pickTicket, hour, mDayOfWeek }} />
-        <ButtonNext onPress={_onPressRequestService} disabled={true}>
+        <ButtonNext onPress={onPressRequestService} disabled={true}>
           지원받기
         </ButtonNext>
       </View>
@@ -223,36 +204,27 @@ class RequestFormScreen extends React.Component {
   }
 }
 
+RequestFormScreen.propTypes = {
+  pickTicket: PropTypes.string,
+  mDayOfWeek: PropTypes.number,
+  fromDate: PropTypes.object,
+  startIndex: PropTypes.number,
+  hour: PropTypes.number
+};
+
 const TIME_FORMAT = "A hh:mm";
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: colors.background
-  },
-  grayLine: {
-    height: 2,
-    backgroundColor: colors.background
+    flex: 1
   },
   txtServiceSubTitle: {
     fontSize: 11
   },
-  viewPlayTicket: {
-    height: 45,
-    justifyContent: "center",
-    backgroundColor: "#ffffff"
-  },
-  txtPlayTicket: {
-    marginLeft: 22.5,
-    fontSize: 15
-  },
-  viewTimeRequest: {
-    backgroundColor: "#ffffff",
-    marginTop: 10
-  },
-  viewSelectDayTime: {},
+  viewTimeRequest: {},
   txtResultPeriod: {
     ...customStyle.center,
-    height: 40
+    paddingVertical: 20,
+    paddingBottom: isSE ? 110 : 0
   },
   radioView: {
     marginTop: 15

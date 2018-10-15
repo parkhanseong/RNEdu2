@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, View, TouchableOpacity, Text } from 'react-native'
-import { colors } from '../../lib/styleUtils'
+import { colors, screenHeight, isX } from '../../lib/styleUtils'
 
 class ButtonNext extends React.Component {
   // onPress = () => {
@@ -29,8 +29,8 @@ const styles = StyleSheet.create({
   },
   btnVeriNext: {
     width: '100%',
-    height: 47,
-    bottom: 0,
+    height: isX ? 55 : 47,
+    bottom: isX ? 0 : 0,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute'

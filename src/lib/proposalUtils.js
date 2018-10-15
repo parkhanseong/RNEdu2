@@ -66,7 +66,7 @@ export const handleEstimatedAmount = (pickTicket, mDayOfWeek, hour) => {
   var { normalAmount, excellentAmount, proAmount } = 0
   var calcul_L = dayCount * hour
   var calcul_S = hour
-
+  var priceArr = []
   // 정기권(L) - 일반(A), 우수(B), 전문(C)
   var typeL_A = 4 * 11000
   var typeL_B = 4 * 14500
@@ -86,5 +86,7 @@ export const handleEstimatedAmount = (pickTicket, mDayOfWeek, hour) => {
     proAmount = typeS_C * calcul_S
   }
 
-  return { normalAmount, excellentAmount, proAmount }
+  priceArr = [normalAmount, excellentAmount, proAmount]
+
+  return priceArr
 }

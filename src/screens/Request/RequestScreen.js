@@ -1,12 +1,13 @@
 import React from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from "react-native";
-import { colors, customStyle } from "../../lib/styleUtils";
+import { colors, customStyle, isSE } from "../../lib/styleUtils";
 import { moment, getTimeString } from "../../lib/timeUtil";
 import { HeaderButton } from "../../components/Base";
 import * as requestActions from "../../redux/modules/request";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { List, Map } from "immutable";
+import PropTypes from "prop-types";
 import _ from "underscore";
 
 class RequestScreen extends React.Component {
@@ -45,7 +46,7 @@ class RequestScreen extends React.Component {
     return false;
   };
 
-  _onPress = () => {
+  onPressRequest = () => {
     this.props.navigation.navigate("RequestForm");
   };
 
@@ -78,12 +79,19 @@ class RequestScreen extends React.Component {
 
   render() {
     var { reqeustTicketInfo } = this.props;
-    reqeustTicketInfo =
-      reqeustTicketInfo === undefined ? undefined : reqeustTicketInfo.toJS();
+    reqeustTicketInfo = !reqeustTicketInfo
+      ? undefined
+      : reqeustTicketInfo.toJS();
 
-    const { pickTicket, fromDate, mDayOfWeek, daysArr, startIndex, hour } =
-      reqeustTicketInfo === undefined ? "" : reqeustTicketInfo;
-    const { _onPress, removeRequestData } = this;
+    const {
+      pickTicket,
+      fromDate,
+      mDayOfWeek,
+      daysArr,
+      startIndex,
+      hour
+    } = !reqeustTicketInfo ? "" : reqeustTicketInfo;
+    const { onPressRequest, removeRequestData } = this;
     const strPeriodTime = getTimeString(startIndex, hour);
     const strFromDate = moment(fromDate).format(FROMDATE_FORMAT);
 
@@ -99,7 +107,7 @@ class RequestScreen extends React.Component {
             </View>
 
             <TouchableOpacity
-              onPress={_onPress}
+              onPress={onPressRequest}
               style={styles.parentBtnRequest}
             >
               <View style={styles.btnRequest}>
@@ -153,39 +161,46 @@ class RequestScreen extends React.Component {
   }
 }
 
+RequestScreen.propTypes = {
+  pickTicket: PropTypes.string,
+  mDayOfWeek: PropTypes.string,
+  fromDate: PropTypes.string,
+  daysArr: PropTypes.string
+};
+
 const FROMDATE_FORMAT = "YYYY[년] MM[월] DD[일] (ddd)";
 const FROMTIME_FORMAT = "A hh:mm";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f4f4f4"
+    backgroundColor: colors.background
   },
   txtNotice: {
-    backgroundColor: "#f4f4f4",
+    backgroundColor: colors.background,
     justifyContent: "center",
-    marginLeft: 20,
-    height: 70
+    height: 70,
+    marginLeft: 20
   },
   txtTitle: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "white",
     justifyContent: "center",
     height: 50,
     paddingHorizontal: 10
   },
   txtReqInfo: {
-    marginTop: 1,
-    backgroundColor: "#ffffff",
-    alignItems: "center",
-    height: 50,
+    backgroundColor: "white",
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    height: 50,
+    marginTop: 1,
     paddingHorizontal: 10
   },
   btnDelete: {
-    marginTop: 10,
-    backgroundColor: "#ffffff",
     ...customStyle.center,
+    backgroundColor: "white",
     height: 50,
+    marginTop: 10,
     paddingHorizontal: 10
   },
   btnText: {
@@ -193,25 +208,25 @@ const styles = StyleSheet.create({
     fontSize: 15
   },
   txtFontStyle: {
-    color: "#b3b3b3",
-    fontSize: 13
+    color: colors.grayText,
+    fontSize: isSE ? 11 : 13
   },
   parentBtnRequest: {
     ...customStyle.center,
-    backgroundColor: "#ffffff",
+    backgroundColor: "white",
     height: 140
   },
   btnRequest: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "white",
     ...customStyle.center
   },
   iconRequest: {
-    color: "#2d2d2d",
-    fontSize: 43
+    color: colors.border,
+    fontSize: isSE ? 41 : 43
   },
   txtRequest: {
-    color: "#2d2d2d",
-    fontSize: 15
+    color: colors.border,
+    fontSize: isSE ? 13 : 15
   }
 });
 

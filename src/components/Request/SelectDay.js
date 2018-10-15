@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, View, Text } from 'react-native'
-import { colors } from '../../lib/styleUtils'
+import { colors, isSE } from '../../lib/styleUtils'
 import DatePicker from 'react-native-datepicker'
 import { moment } from '../../lib/timeUtil'
 class SelectDay extends React.Component {
@@ -17,10 +17,15 @@ class SelectDay extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.viewFormDate}>
-          {pickTicket === 'L' ? <Text>시작 날짜</Text> : <Text>희망 날짜</Text>}
+          {pickTicket === 'L' ? (
+            <Text style={styles.txtTitle}>시작 날짜</Text>
+          ) : (
+            <Text style={styles.txtTitle}>희망 날짜</Text>
+          )}
           <DatePicker
             style={{ width: 140 }}
             date={fromDate}
+            locale='ko'
             mode='date'
             placeholder='select date'
             format='YYYY년 MM월 DD일 (ddd)'
@@ -41,15 +46,18 @@ class SelectDay extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffffff'
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.grayBorder
   },
   viewFormDate: {
-    height: 50,
-    backgroundColor: '#ffffff',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 22.5
+  },
+  txtTitle: {
+    fontSize: isSE ? 14 : 15
   }
 })
 

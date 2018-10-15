@@ -1,3 +1,5 @@
+import { View, Platform, Dimensions } from 'react-native'
+
 export const colors = {
   main: '#F25130',
   text: '#2d2d2d',
@@ -15,3 +17,9 @@ export const customStyle = {
     alignItems: 'center'
   }
 }
+
+export const screenWidth = Dimensions.get('window').width
+export const screenHeight = Dimensions.get('window').height
+export const screenRatio = screenWidth / 375
+export const isSE = screenWidth < 330
+export const isX = screenHeight == 812

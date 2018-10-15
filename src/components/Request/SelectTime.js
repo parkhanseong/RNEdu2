@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, View, Text } from 'react-native'
-import { colors, customStyle } from '../../lib/styleUtils'
+import { colors, customStyle, isSE } from '../../lib/styleUtils'
 import DatePicker from 'react-native-datepicker'
 import { moment, getTimeText } from '../../lib/timeUtil'
 
@@ -21,10 +21,11 @@ class SelectTime extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.viewFromTime}>
-          <Text>시작 시간</Text>
+          <Text style={styles.txtTitle}>시작 시간</Text>
           <DatePicker
             style={{ width: 100, borderColor: '#FFFFFF' }}
             date={startHour}
+            locale='ko'
             mode='time'
             placeholder='select date'
             format={TIME_FORMAT}
@@ -51,15 +52,19 @@ class SelectTime extends React.Component {
 const TIME_FORMAT = 'A hh:mm'
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.grayBorder
   },
   viewFromTime: {
-    backgroundColor: '#ffffff',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 50,
     marginHorizontal: 22.5
+  },
+  txtTitle: {
+    fontSize: isSE ? 14 : 15
   }
 })
 

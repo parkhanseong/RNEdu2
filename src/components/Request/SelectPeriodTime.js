@@ -1,12 +1,12 @@
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, Dimensions } from 'react-native'
 // import { colors } from "../../lib/styleUtils";
 import RadioForm, {
   RadioButton,
   RadioButtonInput,
   RadioButtonLabel
 } from 'react-native-simple-radio-button'
-import { colors, customStyle } from '../../lib/styleUtils'
+import { colors, customStyle, isSE } from '../../lib/styleUtils'
 
 class SelectPeriodTime extends React.Component {
   render () {
@@ -24,7 +24,17 @@ class SelectPeriodTime extends React.Component {
           <RadioForm initial={0} formHorizontal>
             {radio_props.map((obj, i) => {
               return (
-                <RadioButton style={{ marginTop: 10 }} animation key={i}>
+                <RadioButton
+                  style={{
+                    marginTop: 7,
+                    ...customStyle.center
+                  }}
+                  wrapStyle={{
+                    width: Dimensions.get('window').width / 3
+                  }}
+                  animation
+                  key={i}
+                >
                   <RadioButtonInput
                     labelHorizontal
                     obj={obj}
@@ -36,8 +46,8 @@ class SelectPeriodTime extends React.Component {
                     borderWidth={1}
                     buttonInnerColor={'#FF6E40'}
                     buttonOuterColor={hour === i + 2 ? colors.main : '#d1d1d1'}
-                    buttonSize={10}
-                    buttonOuterSize={20}
+                    buttonSize={buttonSize}
+                    buttonOuterSize={buttonOuterSize}
                     buttonWrapStyle={{ marginLeft: 10 }}
                   />
                   <RadioButtonLabel
@@ -47,7 +57,7 @@ class SelectPeriodTime extends React.Component {
                     onPress={value => {
                       onPress('hour', value)
                     }}
-                    labelStyle={{ fontSize: 15 }}
+                    labelStyle={labelStyle}
                     labelWrapStyle={{}}
                   />
                 </RadioButton>
@@ -59,14 +69,18 @@ class SelectPeriodTime extends React.Component {
     )
   }
 }
-
+const buttonSize = isSE ? 8 : 10
+const buttonOuterSize = isSE ? 18 : 20
+const labelStyle = {
+  fontSize: isSE ? 13 : 15
+}
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-    backgroundColor: '#ffffff'
+    backgroundColor: 'white'
   },
   selectPeriodTime: {
     ...customStyle.center,
+    width: Dimensions.get('window').width,
     height: 50
   }
 })

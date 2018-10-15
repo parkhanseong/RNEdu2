@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "ios": "react-native run-ios --simulator i8",
+    "ios SE": "react-native run-ios --simulator SE",
+    "ios X": "react-native run-ios --simulator X",
     "android": "react-native run-android",
     "lint": "./node_modules/.bin/eslint **/*.js",
     "start": "node node_modules/react-native/local-cli/cli.js start",
@@ -48,3 +50,5 @@
     "preset": "react-native"
   }
 }
+
+
